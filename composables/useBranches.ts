@@ -3,18 +3,96 @@ import type { Branch } from "~/types";
 import { handleApiError, type ApiResult } from "~/types/api";
 
 export const useBranches = () => {
-    const runtimeConfig = useRuntimeConfig();
-    const isLoading = ref<boolean>(false);
-    const store = useAuthStore();
-    const { fetch } = useApi();
+  const runtimeConfig = useRuntimeConfig();
+  const isLoading = ref<boolean>(false);
+  const store = useAuthStore();
+  const { fetch } = useApi();
 
-    const getBranches: () => ApiResult<Branch[]> = async () => {
+    const getBranches: (
+      currentOperatorId: string,
+      page?: number,
+      size?: number
+    ) => ApiResult<Branch[]> = async (currentOperatorId, page, size) => {
+      try {
+        const { data, pending, error, status } = await fetch<Branch[]>(
+          `/api/v1/merchants/${currentOperatorId}/branches2`,
+          {
+            params: { page, size },
+          }
+        );
+  
+        isLoading.value = pending.value;
+  
+        if (status.value === "error") {
+          handleApiError(error);
+        }
+  
+        return data.value ? (data.value as unknown as Branch[]) : null;
+      } catch (err) {
+        
+        throw err;
+      }
+    };
 
-            try {
-      const { data, pending, error, status } = await fetch<Branch[]>(
-        `/api/v1/merchants/branches`,
+  const getBranchById: (currentOperatorId: string, id: string) => ApiResult<Branch> = async (currentOperatorId, id) => {
+    try {
+      const { data, pending, error, status } = await fetch<Branch>(
+        `/api/v1/merchants/${currentOperatorId}/branches2/${id}`
+      );
+
+      isLoading.value = pending.value;
+
+      if (status.value === "error") {
+        handleApiError(error);
+      }
+
+      return data.value ? (data.value as unknown as Branch) : null;
+    } catch (err) {
+      // handleApiError(err);
+      throw err
+    }
+
+
+    // try {
+    //     const { data, error, status } = await useFetch<Branch>(
+    //         `${runtimeConfig.public.API_BASE_URL}/api/v1/merchants/branches/${id}`,
+    //         {
+    //             method: "GET",
+    //             headers: {
+    //                 Authorization: `Bearer ${store.accessToken}`,
+    //             },
+    //         }
+    //     );
+
+    //     if (status.value === "error") {
+    //         toast({
+    //             title: error.value?.data?.type || "Something went wrong!",
+    //             description: error.value?.data?.detail || error.value?.data?.message,
+    //             variant: "destructive"
+    //         })
+    //         throw new Error(error.value?.data?.detail || error.value?.data?.message);
+    //     }
+
+    //     if (!data.value) {
+    //         throw new Error("No merchants data received");
+    //     }
+    //     return data.value;
+    // } catch (err) {
+    //     throw err;
+    // }
+  };
+
+
+  const createNeweMerchantBranch: (
+    currentOperatorId: string,
+    merchantData: any
+  ) => ApiResult<Branch> = async (currentOperatorId, merchantData) => {
+    try {
+      const { data, pending, error, status } = await fetch<Branch>(
+        `/api/v1/merchants/${currentOperatorId}/branches2`,
         {
-          method: "GET",
+          method: "POST",
+          body: merchantData,
         }
       );
 
@@ -24,69 +102,64 @@ export const useBranches = () => {
         handleApiError(error);
       }
 
-      return data.value ? (data.value as unknown as Branch[]) : null;
+      return data.value ? (data.value as unknown as Branch) : null;
     } catch (err) {
-      // handleApiError(err);
-      return null;
-    } finally {
-      isLoading.value = false;
+      throw err;
     }
+  };
 
-    };
+  const updateMerchantBranch: (
+    currentOperatorId: string,
+    branchId: string,
+    branchData: any
+  ) => ApiResult<Branch> = async (currentOperatorId, branchId, branchData) => {
+    try {
+      const { data, pending, error, status } = await fetch<Branch>(
+        `/api/v1/merchants/${currentOperatorId}/branches2/${branchId}`,
+        {
+          method: "PUT",
+          body: branchData,
+        }
+      );
 
-    const getBranchById: (id: string) => ApiResult<Branch> = async (id) => {
-        try {
-            const { data, pending, error, status } = await fetch<Branch>(
-              `/api/v1/merchants/branches/${id}`
-            );
-      
-            isLoading.value = pending.value;
-      
-            if (status.value === "error") {
-              handleApiError(error);
-            }
-      
-            return data.value ? (data.value as unknown as Branch) : null;
-          } catch (err) {
-            // handleApiError(err);
-            return null;
-          }
+      isLoading.value = pending.value;
 
+      if (status.value === "error") {
+        handleApiError(error);
+      }
 
-        // try {
-        //     const { data, error, status } = await useFetch<Branch>(
-        //         `${runtimeConfig.public.API_BASE_URL}/api/v1/merchants/branches/${id}`,
-        //         {
-        //             method: "GET",
-        //             headers: {
-        //                 Authorization: `Bearer ${store.accessToken}`,
-        //             },
-        //         }
-        //     );
+      return data.value ? (data.value as unknown as Branch) : null;
+    } catch (err) {
+      throw err;
+    }
+  };
 
-        //     if (status.value === "error") {
-        //         toast({
-        //             title: error.value?.data?.type || "Something went wrong!",
-        //             description: error.value?.data?.detail || error.value?.data?.message,
-        //             variant: "destructive"
-        //         })
-        //         throw new Error(error.value?.data?.detail || error.value?.data?.message);
-        //     }
+  const deleteMerchantBranch: (currentOperatorId: string, branchId: string) => ApiResult<any> = async (currentOperatorId, branchId) => {
+    try {
+      const { data, pending, error, status } = await fetch<any>(
+        `/api/v1/merchants/${currentOperatorId}/branches2/${branchId}`,
+        { method: "DELETE" }
+      );
 
-        //     if (!data.value) {
-        //         throw new Error("No merchants data received");
-        //     }
-        //     return data.value;
-        // } catch (err) {
-        //     throw err;
-        // }
-    };
+      isLoading.value = pending.value;
+
+      if (status.value === "error") {
+        handleApiError(error);
+      }
+
+      return data.value;
+    } catch (err) {
+      throw err;
+    }
+  };
 
 
-
-    return {
-        getBranches,
-        isLoading,
-        getBranchById,
-    };
+  return {
+    getBranches,
+    isLoading,
+    getBranchById,
+    createNeweMerchantBranch,
+    deleteMerchantBranch,
+    updateMerchantBranch
+  };
 };

@@ -10,8 +10,10 @@ import {
 import { profileFormSchema } from "~/validations/profileFormSchema";
 import { toast } from "~/components/ui/toast";
 import { format } from "date-fns";
+import type { Profile } from "~/types";
 
 const { getProfile, updateProfile } = useProfile();
+const authStore = useAuthStore();
 const isError = ref(false);
 const data = ref<Profile>();
 const isSubmitting = ref(false);
@@ -30,6 +32,7 @@ try {
   isLoading.value = true;
   data.value = await getProfile(); // Call your API function to fetch profile
   if (data.value) {
+    authStore.setProfile(data.value)
     form.setValues({
       ...data.value,
     });

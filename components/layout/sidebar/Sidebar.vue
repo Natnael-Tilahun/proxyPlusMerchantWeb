@@ -142,6 +142,20 @@ const mainLinks: Link[] = [
     size: "22",
     showDropdown: false,
   },
+  {
+    title: "Operators",
+    icon: "uil:users-alt",
+    link: "/operators",
+    size: "22",
+    showDropdown: false,
+  },
+  {
+    title: "Branches",
+    icon: "uil:home",
+    link: "/branches",
+    size: "22",
+    showDropdown: false,
+  },
 ];
 const { logout } = useAuth();
 
