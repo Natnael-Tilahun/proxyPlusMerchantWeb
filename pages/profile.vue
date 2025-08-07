@@ -154,7 +154,7 @@ try {
               <FormMessage />
             </FormItem>
           </FormField>
-          <FormField v-slot="{ componentField }" name="operatorRole">
+          <FormField v-slot="{ componentField }" name="operatorRoleId">
             <FormItem>
               <FormLabel>Operator Role </FormLabel>
               <FormControl>

@@ -72,14 +72,14 @@ async function deleteMerchantOperators(id: string) {
       </UiButton>
     </UiDropdownMenuTrigger>
     <UiDropdownMenuContent align="end" class="w-[160px]">
-      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT">
+      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR">
         <UiDropdownMenuItem
           @click="viewMerchantOperatorDetail(row.original.merchantOperatorId)"
           >View and Edit
         </UiDropdownMenuItem>
         <UiDropdownMenuSeparator />
       </UiPermissionGuard>
-      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT">
+      <UiPermissionGuard :permission="PermissionConstants.RESET_MERCHANT_OPERATOR_PASSWORD">
         <!-- <UiDropdownMenuItem 
         > -->
         <UiSheet :open="openSheet" :onOpenChange="setOpenSheet">
@@ -102,7 +102,7 @@ async function deleteMerchantOperators(id: string) {
         > -->
         <UiDropdownMenuSeparator />
       </UiPermissionGuard>
-      <UiPermissionGuard :permission="PermissionConstants.DELETE_MERCHANT">
+      <UiPermissionGuard :permission="PermissionConstants.DELETE_MERCHANT_OPERATOR">
         <UiDropdownMenuItem
           @click="setOpenEditModal(true)"
           class="text-red-600"

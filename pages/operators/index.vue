@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import type { Operator } from "~/types";
 import { columns as tableColumns } from "~/components/operators/columns"; // Renamed to avoid conflict
+import { PermissionConstants } from "~/constants/permissions";
 
 const {getMerchantOperators} = useOperators()
 const isLoading = ref(false);
@@ -53,7 +54,7 @@ const columns = computed(() => tableColumns(refetch));
     v-else-if="data && !isError"
     class="py-5 flex flex-col space-y-10 mx-auto"
   >
-    <!-- <UiPermissionGuard :permission="PermissionConstants.CREATE_STAFF_ASSIGNMENT" > -->
+    <UiPermissionGuard :permission="PermissionConstants.CREATE_MERCHANT_OPERATOR" >
       <div class="w-full flex justify-end gap-4">
 
       <NuxtLink to="/operators/invite" class="w-fit self-end">
@@ -69,8 +70,7 @@ const columns = computed(() => tableColumns(refetch));
       >
     </NuxtLink>
   </div>
-
-    <!-- </UiPermissionGuard> -->
+    </UiPermissionGuard>
     <UiDataTable :columns="columns" :data="data">
       <template v-slot:toolbar="{ table }">
       </template>

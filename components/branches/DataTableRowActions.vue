@@ -27,7 +27,7 @@ const props = defineProps<{
 const emit = defineEmits(["merchantBranchesDeleted", "editMerchantBranches"]); // Added 'languageDeleted'
 
 function viewMerchantBranchDetail(id: string) {
-  navigateTo(`${route.path}?activeTab=branchDetails&branchId=${id}`);
+  navigateTo(`/branches/${id}`);
 }
 
 async function deleteMerchantBranches(id: string) {
@@ -64,14 +64,14 @@ async function deleteMerchantBranches(id: string) {
       </UiButton>
     </UiDropdownMenuTrigger>
     <UiDropdownMenuContent align="end" class="w-[160px]">
-      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT">
+      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_BRANCH">
         <UiDropdownMenuItem
           @click="viewMerchantBranchDetail(row.original.merchantBranchId)"
           >View and Edit
         </UiDropdownMenuItem>
         <UiDropdownMenuSeparator />
       </UiPermissionGuard>
-      <UiPermissionGuard :permission="PermissionConstants.DELETE_MERCHANT">
+      <UiPermissionGuard :permission="PermissionConstants.DELETE_MERCHANT_BRANCH">
         <UiDropdownMenuItem
           @click="setOpenEditModal(true)"
           class="text-red-600"

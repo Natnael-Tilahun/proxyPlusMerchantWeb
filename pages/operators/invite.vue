@@ -227,9 +227,9 @@ const onSubmit = form.handleSubmit(async (values: any) => {
               </FormItem>
             </FormField>
 
-            <!-- <UiPermissionGuard
-              :permission="PermissionConstants.UPDATE_APPLICATION_VERSION"
-            > -->
+            <UiPermissionGuard
+              :permission="PermissionConstants.CREATE_MERCHANT_OPERATOR"
+            >
             <div class="col-span-full w-full py-4 flex justify-between">
               <UiButton :disabled="isSubmitting" variant="outline" type="button" @click="$router.go(-1)">
                 Cancel
@@ -240,7 +240,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                 Create
               </UiButton>
             </div>
-            <!-- </UiPermissionGuard> -->
+            </UiPermissionGuard>
           </div>
         </form>
       </div>

@@ -199,9 +199,9 @@ const onSubmit = form.handleSubmit(async (values: any) => {
               </FormItem>
             </FormField>
 
-            <!-- <UiPermissionGuard
-              :permission="PermissionConstants.UPDATE_APPLICATION_VERSION"
-            > -->
+            <UiPermissionGuard
+              :permission="PermissionConstants.CREATE_MERCHANT_BRANCH"
+            >
               <div class="col-span-full w-full py-4 flex justify-between">
                 <UiButton
                   :disabled="isSubmitting"
@@ -218,10 +218,10 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                     class="mr-2 h-4 w-4 animate-spin"
                   ></Icon>
 
-                  Update
+                  Create
                 </UiButton>
               </div>
-            <!-- </UiPermissionGuard> -->
+            </UiPermissionGuard>
           </div>
         </form>
       </div>

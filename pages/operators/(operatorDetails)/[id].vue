@@ -279,7 +279,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
               </FormItem>
             </FormField>
 
-            <UiPermissionGuard :permission="PermissionConstants.UPDATE_APPLICATION_VERSION" >
+            <UiPermissionGuard :permission="PermissionConstants.UPDATE_MERCHANT_OPERATOR" >
             <div class="col-span-full w-full py-4 flex justify-between">
               <UiButton
                 :disabled="isSubmitting"

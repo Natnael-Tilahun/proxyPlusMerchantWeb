@@ -226,3 +226,17 @@ interface Account {
   lastUpdated?: string | Data | null;
   accountHolder?: string | null;
 }
+
+export interface MenuItem {
+  title: string;
+  link?: string;
+  icon: string;
+  size?: string;
+  showDropdown?: boolean;
+  permission?: string;
+  dropdown?: {
+    title: string;
+    link: string;
+    permission: string;
+  }[];
+}

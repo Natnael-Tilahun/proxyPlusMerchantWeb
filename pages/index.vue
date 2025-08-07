@@ -2,6 +2,7 @@
 import { Skeleton } from "~/components/ui/skeleton";
 import { Icons } from "~/components/icons";
 import type { Transaction } from "~/types";
+import { PermissionConstants } from "~/constants/permissions";
 
 const { getTransactions } = useTransactions();
 const isLoading = ref(true);
@@ -254,6 +255,7 @@ watch(
       </UiCard>
 
       <!-- Initiate payment -->
+    <UiPermissionGuard :permission="PermissionConstants.INIT_MERCHANT_TRANSACTION">
       <UiCard
         class="col-span-1 lg:col-span-3  max-h-min xl:col-span-4 p-6 space-y-4 w-full"
       >
@@ -262,6 +264,7 @@ watch(
         </h1>
         <DashboardInitiatePaymentQRCode />
       </UiCard>
+      </UiPermissionGuard>
     </div>
 
     <div
@@ -279,6 +282,8 @@ watch(
         </UiCardContent>
       </UiCard>
 
+    <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_BRANCH_TRANSACTION">
+      
       <!-- Recent Transactions -->
       <UiCard
         class="col-span-1 lg:col-span-3 max-h-[450px] xl:col-span-4 shadow-md rounded-xl dark:bg-gray-800"
@@ -300,6 +305,7 @@ watch(
           <DashboardRecentSales :transactionData="transactionData" />
         </UiCardContent>
       </UiCard>
+      </UiPermissionGuard>
     </div>
   </div>
 </template>

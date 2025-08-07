@@ -224,7 +224,10 @@ const validateOTP = async () => {
 
       try {
         // Try to get user authorities
-        const authoritiesResponse =  await getProfile();        
+        const profileResponse =  await getProfile();       
+        if(profileResponse?.merchantOperatorId){
+
+        const authoritiesResponse =  await getAuthorities(profileResponse?.merchantOperatorId);        
         if (authoritiesResponse) {
           toast({
             title: "Success",
@@ -232,6 +235,7 @@ const validateOTP = async () => {
           });
           navigateTo("/");
         }
+      } 
       } catch (authoritiesError: any) {
         console.error("Error getting operator:", authoritiesError);
         handleApiError(authoritiesError);
