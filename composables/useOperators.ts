@@ -196,7 +196,7 @@ export const useOperators = () => {
   const getMerchantOperatorRoles: () => ApiResult<OperatorRole[]> = async () => {
     try {
       const { data, pending, error, status } = await fetch<OperatorRole[]>(
-        '/api/v1/internal/merchants/operator-roles'
+        '/api/v1/merchants2/operator/roles'
       );
 
       isLoading.value = pending.value;

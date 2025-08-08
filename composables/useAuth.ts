@@ -15,7 +15,7 @@ export const useAuth = () => {
   const login = async (user: UserInput) => {
     try {
       const { data, pending, error, status } = await fetch<AuthResponse>(
-        "/api/v1/operators/sign-in",
+        "/api/v1/merchants2/operators/sign-in",
         {
           method: "POST",
           body: user,
@@ -204,7 +204,7 @@ export const useAuth = () => {
   const getAuthorities: (currentOperatorId:string) => ApiResult<string[]> = async (currentOperatorId) => {
     try {
       const { data, pending, error, status } = await fetch<AuthResponse>(
-        `/api/v1/merchants2/operators/permissions`
+        `/api/v1/merchants2/operators/permissions/mine`
       );
 
       isLoading.value = pending.value;
@@ -237,7 +237,7 @@ export const useAuth = () => {
   const getAuthoritiesRole: (currentOperatorId:string) => ApiResult<string[]> = async (currentOperatorId) => {
     try {
       const { data, pending, error, status } = await fetch<AuthResponse>(
-        `/api/v1/merchants2/operators/role`
+        `/api/v1/merchants2/operators/role/mine`
       );
 
       isLoading.value = pending.value;
