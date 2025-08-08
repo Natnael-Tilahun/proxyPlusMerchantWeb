@@ -22,7 +22,7 @@ const setOpenConfirmationModal = (value: boolean) => {
 try {
   isLoading.value = true;
   const id = route.params.id as string;
-  transactionData.value = await getTransactionById(merchantId.value, id);
+  transactionData.value = await getMyTransactionById(merchantId.value, id);
   transactionId.value = transactionData.value?.merchantTransactionId;
   if (transactionData.value?.paymentStatus == "PENDING" && transactionData.value?.merchantTransactionId) {
     connect(transactionId.value || "");
@@ -107,7 +107,7 @@ const closeConfirmationModal = () => {
         <TransactionsTransactionDetailItem label="Core Transaction Id" :value="transactionData.coreTransactionId" />
         <TransactionsTransactionDetailItem label="Merchant Account Number"
           :value="transactionData.merchantAccountNumber" />
-        <TransactionsTransactionDetailItem label="Payer AccountNumber" :value="transactionData.payerAccountNumber?.length && formatAccountNumber(typeof transactionData.payerAccountNumber === 'string' ? transactionData.payerAccountNumber: '-')" />
+        <TransactionsTransactionDetailItem label="Payer AccountNumber" :value="formatAccountNumber(transactionData.payerAccountNumber)" />
         <TransactionsTransactionDetailItem label="Payer Id" :value="transactionData.payerId" />
         <TransactionsTransactionDetailItem label="Payer Name" :value="transactionData.payerName" />
         <TransactionsTransactionDetailItem label="Payer Phone" :value="transactionData.payerPhone" />

@@ -27,7 +27,7 @@ const props = defineProps<{
 const emit = defineEmits(["merchantBranchesDeleted", "editMerchantBranches"]); // Added 'languageDeleted'
 
 function viewMerchantBranchDetail(id: string) {
-  navigateTo(`/branches/${id}`);
+  navigateTo(`/branches/branchDetails/${id}`);
 }
 
 async function deleteMerchantBranches(id: string) {

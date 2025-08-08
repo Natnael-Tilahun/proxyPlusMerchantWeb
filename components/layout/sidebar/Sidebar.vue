@@ -45,7 +45,7 @@
                     @click="closeMenuNav"
                     class="w-full border-l-2 my-1 hover:rounded-r-lg group-hover:border-primary hover:bg-accent px-4 py-3 rounded-none hover:text-primary"
                     :class="{
-                      'text-primary bg-[#8C2A7C]/15 rounded-lg font-bold':
+                      'bg-[#8C2A7C]/15 rounded-lg font-bold':
                         isRouteActive(item.link),
                     }"
                     >
@@ -124,6 +124,7 @@ const closeMenuNav = () => {
 };
 
 const hasVisibleDropdownItems = (link: MenuItem) => {
+  console.log("hasVisibleDropdownItems: ", link)
   return link.dropdown?.some((item) => (authStore as any).hasPermissions(item.permission ?? ''));
 };
 

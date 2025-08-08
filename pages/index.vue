@@ -12,6 +12,9 @@ const showFullAvailableBalance = ref(false);
 const showFullCurrentBalance = ref(false);
 const currentPaymentSummaryOption = ref("Daily");
 const transactionsNumber = ref();
+const merchantId = ref<string>("");
+const authStore = useAuthStore();
+merchantId.value = authStore.profile?.merchantOperatorId
 
 const paymentSummaryOptions = computed(() => [
   "Daily",
@@ -101,6 +104,7 @@ try {
   yesterday.setDate(yesterday.getDate() - 1);
   yesterday.setHours(0, 0, 0, 0);
   transactionData.value = await getTransactions(
+    merchantId.value,
     " ",
     "0",
     "10000000",
@@ -271,6 +275,7 @@ watch(
       class="grid gap-4 md:gap-8 max-h-[400px] grid-cols-1 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-9"
     >
       <!-- Account Overview -->
+      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION">
       <UiCard
         class="col-span-1 lg:col-span-4 max-h-[450px] xl:col-span-5 shadow-md rounded-xl dark:bg-gray-800"
       >
@@ -281,9 +286,9 @@ watch(
           <DashboardOverview :transactionData="transactionData" />
         </UiCardContent>
       </UiCard>
+      </UiPermissionGuard>
 
-    <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_BRANCH_TRANSACTION">
-      
+    <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION">
       <!-- Recent Transactions -->
       <UiCard
         class="col-span-1 lg:col-span-3 max-h-[450px] xl:col-span-4 shadow-md rounded-xl dark:bg-gray-800"

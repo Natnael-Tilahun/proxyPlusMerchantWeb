@@ -12,6 +12,7 @@ import { ref } from "vue";
 import { toast } from "~/components/ui/toast";
 import { PermissionConstants } from "~/constants/permissions";
 import type { Branch, Operator, OperatorRole } from "~/types";
+import { getIdFromPath } from "~/lib/utils";
 
 const { getMerchantOperatorById, updateMerchantOperator, getMerchantOperatorRoles } =
   await useOperators();
@@ -30,7 +31,7 @@ const route = useRoute();
 const authStore = useAuthStore();
 merchantId.value = authStore.profile?.merchantOperatorId
 
-operatorId.value = route.query.operatorId;
+operatorId.value = getIdFromPath()
 
 const isSubmitting = ref(false);
 

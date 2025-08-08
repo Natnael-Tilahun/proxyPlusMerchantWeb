@@ -12,6 +12,7 @@ export const useTransactions = () => {
     const { fetch } = useApi();
 
     const getTransactions: (
+        currentOperatorId?:string,
         paymentStatus?: string, 
         pageNumber?: string, 
         pageSize?: string, 
@@ -34,6 +35,7 @@ export const useTransactions = () => {
         initiatedDate?: string, 
         completedDate?: string, 
      ) => ApiResult<Transaction[]> = async (
+        currentOperatorId=undefined,
         paymentStatus = undefined, 
         pageNumber = undefined, 
         pageSize = undefined, 
@@ -59,7 +61,7 @@ export const useTransactions = () => {
 
       try {
         const { data, pending, error, status } = await fetch<Transaction[]>(
-          `/api/v1/operators/transactions`,
+          `/api/v1/merchants2/transactions/${currentOperatorId}/mine`,
           {
             method: "GET",
             params:{
@@ -140,10 +142,142 @@ export const useTransactions = () => {
       }
     };
 
-    const getTransactionById: (id: string) => ApiResult<Transaction> = async (id) => {
+    const getAllTransactions: (
+      currentOperatorId?:string,
+      paymentStatus?: string, 
+      pageNumber?: string, 
+      pageSize?: string, 
+      sortBy?: string, 
+      expirationDate?: string, 
+      transactionInitiator?: string, 
+      amountGreaterThanOrEqual?: number, 
+      amountLessThanOrEqual?: number, 
+      payerName?: string, 
+      payerPhone?: string, 
+      payerAccountNumber?: number, 
+      payerId?: string, 
+      paymentReference?: string, 
+      dynamicId?: string, 
+      mbTransactionId?: string, 
+      coreTransactionId?: string, 
+      merchantAccountNumber?: number, 
+      merchantBranchId?: string, 
+      merchantOperatorId?: string, 
+      initiatedDate?: string, 
+      completedDate?: string, 
+   ) => ApiResult<Transaction[]> = async (
+      currentOperatorId=undefined,
+      paymentStatus = undefined, 
+      pageNumber = undefined, 
+      pageSize = undefined, 
+      sortBy = undefined,
+      expirationDate= undefined, 
+      transactionInitiator= undefined, 
+      amountGreaterThanOrEqual= undefined, 
+      amountLessThanOrEqual= undefined, 
+      payerName= undefined, 
+      payerPhone= undefined, 
+      payerAccountNumber= undefined, 
+      payerId= undefined, 
+      paymentReference= undefined, 
+      dynamicId= undefined, 
+      mbTransactionId= undefined, 
+      coreTransactionId= undefined, 
+      merchantAccountNumber= undefined, 
+      merchantBranchId= undefined, 
+      merchantOperatorId= undefined, 
+      initiatedDate= undefined, 
+      completedDate= undefined, 
+  ) => {
+
+    try {
+      const { data, pending, error, status } = await fetch<Transaction[]>(
+        `/api/v1/merchants2/transactions`,
+        {
+          method: "GET",
+          params:{
+            currentOperatorId:currentOperatorId,
+            ...(paymentStatus || transactionFilterStore.paymentStatus ? {
+                "paymentStatus.equals": paymentStatus ?? transactionFilterStore.paymentStatus == 'NONE' ? '' : transactionFilterStore.paymentStatus
+              } : {}),
+            // "paymentStatus.equals": paymentStatus ?? transactionFilterStore.paymentStatus == 'NONE' ? '' : transactionFilterStore.paymentStatus,
+            "page": pageNumber ?? transactionFilterStore.pageNumber,
+            "size": pageSize ?? transactionFilterStore.pageSize,
+            "sort":  `${sortBy ?? transactionFilterStore.sortBy}`,
+            ...(transactionInitiator || (transactionFilterStore.transactionInitiator !== 'NONE' && transactionFilterStore.transactionInitiator !== '') ? {
+                "transactionInitiator.equals": transactionInitiator ?? transactionFilterStore.transactionInitiator
+              } : {}),
+              ...(amountGreaterThanOrEqual || transactionFilterStore.amountGreaterThanOrEqual ? {
+                "amount.greaterThanOrEqual": amountGreaterThanOrEqual ?? transactionFilterStore.amountGreaterThanOrEqual
+              } : {}),
+              ...(amountLessThanOrEqual || transactionFilterStore.amountLessThanOrEqual ? {
+                "amount.lessThanOrEqual": amountLessThanOrEqual ?? transactionFilterStore.amountLessThanOrEqual
+              } : {}),
+              ...(payerName || transactionFilterStore.payerName ? {
+                "payerName.contains": payerName ?? transactionFilterStore.payerName
+              } : {}),
+              ...(payerPhone || transactionFilterStore.payerPhone ? {
+                "payerPhone.contains": payerPhone ?? transactionFilterStore.payerPhone
+              } : {}),
+              ...(payerAccountNumber || transactionFilterStore.payerAccountNumber ? {
+                "payerAccountNumber.in": payerAccountNumber ?? transactionFilterStore.payerAccountNumber
+              } : {}),
+              ...(payerId || transactionFilterStore.payerId ? {
+                "payerId.contains": payerId ?? transactionFilterStore.payerId
+              } : {}),
+              ...(paymentReference || transactionFilterStore.paymentReference ? {
+                "paymentReference.contains": paymentReference ?? transactionFilterStore.paymentReference
+              } : {}),
+              ...(dynamicId || transactionFilterStore.dynamicId ? {
+                "dynamicId.contains": dynamicId ?? transactionFilterStore.dynamicId
+              } : {}),
+              ...(mbTransactionId || transactionFilterStore.mbTransactionId ? {
+                "mbTransactionId.contains": mbTransactionId ?? transactionFilterStore.mbTransactionId
+              } : {}),
+              ...(coreTransactionId || transactionFilterStore.coreTransactionId ? {
+                "coreTransactionId.contains": coreTransactionId ?? transactionFilterStore.coreTransactionId
+              } : {}),
+              ...(merchantAccountNumber || transactionFilterStore.merchantAccountNumber ? {
+                "merchantAccountNumber.contains": merchantAccountNumber ?? transactionFilterStore.merchantAccountNumber
+              } : {}),
+              ...(merchantBranchId || transactionFilterStore.merchantBranchId ? {
+                "merchantBranchId.equals": merchantBranchId ?? transactionFilterStore.merchantBranchId
+              } : {}),
+              ...(merchantOperatorId || transactionFilterStore.merchantOperatorId ? {
+                "merchantOperatorId.equals": merchantOperatorId ?? transactionFilterStore.merchantOperatorId
+              } : {}),
+              ...(initiatedDate || transactionFilterStore.initiatedDate ? {
+                "initiatedDate.greaterThanOrEqual": initiatedDate ?? transactionFilterStore.initiatedDate
+              } : {}),
+              ...(completedDate || transactionFilterStore.completedDate ? {
+                "completedDate.greaterThanOrEqual": completedDate ?? transactionFilterStore.completedDate
+              } : {}),
+              ...(expirationDate || transactionFilterStore.expirationDate ? {
+                "expirationDate.greaterThanOrEqual": expirationDate ?? transactionFilterStore.expirationDate
+              } : {}),
+        }
+        }
+      );
+
+      isLoading.value = pending.value;
+
+      if (status.value === "error") {
+        handleApiError(error);
+      }
+
+      return data.value ? (data.value as unknown as Transaction[]) : null;
+    } catch (err) {
+      // handleApiError(err);
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+    const getMyTransactionById: (currentOperatorId:string, id: string) => ApiResult<Transaction> = async ( currentOperatorId,id) => {
       try {
         const { data, pending, error, status } = await fetch<Transaction>(
-          `/api/v1/merchants/transactions/${id}?PaymentStatus.equals=NONE`
+          `/api/v1/merchants2/transactions/${currentOperatorId}/mine/${id}`
         );
   
         isLoading.value = pending.value;
@@ -160,10 +294,49 @@ export const useTransactions = () => {
 
     };
 
-    const getTransactionsByOperatorId: (id: string) => ApiResult<Transaction[]> = async (id) => {
+    const getTransactionById: (currentOperatorId:string, id: string) => ApiResult<Transaction> = async ( currentOperatorId,id) => {
+      try {
+        const { data, pending, error, status } = await fetch<Transaction>(
+          `/api/v1/merchants2/transactions/${id}?currentOperatorId=${currentOperatorId}`
+        );
+  
+        isLoading.value = pending.value;
+  
+        if (status.value === "error") {
+          handleApiError(error);
+        }
+  
+        return data.value ? (data.value as unknown as Transaction) : null;
+      } catch (err) {
+        // handleApiError(err);
+        return null;
+      } 
+
+    };
+
+    const getTransactionsByOperatorId: (operatorId: string) => ApiResult<Transaction[]> = async (operatorId) => {
       try {
         const { data, pending, error, status } = await fetch<Transaction[]>(
-          `/api/v1/merchants/operators/${id}/transactions`
+          `/api/v1/merchants2/transactions/operators/${operatorId}`
+        );
+  
+        isLoading.value = pending.value;
+  
+        if (status.value === "error") {
+          handleApiError(error);
+        }
+  
+        return data.value ? (data.value as unknown as Transaction[]) : null;
+      } catch (err) {
+        // handleApiError(err);
+        return null;
+      }   
+    };
+
+    const getTransactionsByBranchId: (branchId: string) => ApiResult<Transaction[]> = async (branchId) => {
+      try {
+        const { data, pending, error, status } = await fetch<Transaction[]>(
+          `/api/v1/merchants2/transactions/branch/${branchId}`
         );
   
         isLoading.value = pending.value;
@@ -183,5 +356,8 @@ export const useTransactions = () => {
         getTransactions,
         getTransactionById,
         getTransactionsByOperatorId,
+        getTransactionsByBranchId,
+        getAllTransactions,
+        getMyTransactionById
     };
 };

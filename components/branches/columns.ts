@@ -43,7 +43,7 @@ export const columns = (
             {
               class:
                 "font-medium text-primary w-fit whitespace-nowrap truncate hover:w-full",
-              to: `/branches/${merchantBranchId}`,
+              to: `/branches/branchDetails/${merchantBranchId}`,
             },
             branchName ? branchName : "View Brach"
           )

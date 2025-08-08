@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { columns } from "~/components/transactions/columns";
+import { columns } from "~/components/myTransactions/columns";
 import { useTransactions } from "~/composables/useTransactions";
 import { useRouter } from "vue-router"; // {{ edit_1 }}
 import type { Transaction } from "~/types";
 
-const { getTransactions, getAllTransactions } = useTransactions();
+const { getTransactions } = useTransactions();
 const data = ref<Transaction[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
@@ -16,7 +16,7 @@ const authStore = useAuthStore();
 merchantId.value = authStore.profile?.merchantOperatorId
 
 try {
-  const response = await getAllTransactions(merchantId.value, " ",
+  const response = await getTransactions(merchantId.value," ",
     "0",
     "10000000",
     "DESC");

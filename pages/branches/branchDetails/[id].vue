@@ -24,7 +24,7 @@ const route = useRoute();
 const authStore = useAuthStore();
 merchantId.value = authStore.profile?.merchantOperatorId
 
-branchId.value = route.query.branchId;
+branchId.value = route.params.id as string;
 const accountsData = ref<Account[]>([]);
 
 const props = defineProps<{

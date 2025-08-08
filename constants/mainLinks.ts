@@ -12,12 +12,11 @@ export const mainLinks: MenuItem[] = [
   {
     title: "Transactions",
     icon: "uil:transaction",
-    link: "/transactions",
+    // link: "/transactions",
     size: "22",
-    showDropdown: true,
-    // permission: PermissionConstants.READ_MERCHANT_TRANSACTION
+    showDropdown: false,
     dropdown: [
-      { title: "Mine", link: "/myTransactions", permission: PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION },
+      { title: "Mine", link: "/transactions/mine", permission: PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION},
       { title: "All Transactions", link: "/transactions", permission: PermissionConstants.READ_MERCHANT_TRANSACTION},
     ],
   },
