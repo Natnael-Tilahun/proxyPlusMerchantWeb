@@ -204,7 +204,7 @@ export const useAuth = () => {
   const getAuthorities: (currentOperatorId:string) => ApiResult<string[]> = async (currentOperatorId) => {
     try {
       const { data, pending, error, status } = await fetch<AuthResponse>(
-        `/api/v1/merchants/${currentOperatorId}/operators/permissions`
+        `/api/v1/merchants2/operators/permissions`
       );
 
       isLoading.value = pending.value;
@@ -237,7 +237,7 @@ export const useAuth = () => {
   const getAuthoritiesRole: (currentOperatorId:string) => ApiResult<string[]> = async (currentOperatorId) => {
     try {
       const { data, pending, error, status } = await fetch<AuthResponse>(
-        `/api/v1/merchants/${currentOperatorId}/operators/role`
+        `/api/v1/merchants2/operators/role`
       );
 
       isLoading.value = pending.value;

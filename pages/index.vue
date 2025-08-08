@@ -4,7 +4,7 @@ import { Icons } from "~/components/icons";
 import type { Transaction } from "~/types";
 import { PermissionConstants } from "~/constants/permissions";
 
-const { getTransactions } = useTransactions();
+const { getAllTransactions } = useTransactions();
 const isLoading = ref(true);
 const transactionData = ref<Transaction[]>([]);
 const todaysTransactions = ref<Transaction[]>([]);
@@ -12,9 +12,7 @@ const showFullAvailableBalance = ref(false);
 const showFullCurrentBalance = ref(false);
 const currentPaymentSummaryOption = ref("Daily");
 const transactionsNumber = ref();
-const merchantId = ref<string>("");
-const authStore = useAuthStore();
-merchantId.value = authStore.profile?.merchantOperatorId
+
 
 const paymentSummaryOptions = computed(() => [
   "Daily",
@@ -103,8 +101,7 @@ try {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   yesterday.setHours(0, 0, 0, 0);
-  transactionData.value = await getTransactions(
-    merchantId.value,
+  transactionData.value = await getAllTransactions(
     " ",
     "0",
     "10000000",

@@ -5,18 +5,16 @@ import { useTransactions } from "~/composables/useTransactions";
 import { useRouter } from "vue-router"; // {{ edit_1 }}
 import type { Transaction } from "~/types";
 
-const { getTransactions, getAllTransactions } = useTransactions();
+const { getAllTransactions } = useTransactions();
 const data = ref<Transaction[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
 const router = useRouter(); // {{ edit_2 }}
 const transactionFilterStore = useTransactionFilterStore();
-const merchantId = ref<string>("");
-const authStore = useAuthStore();
-merchantId.value = authStore.profile?.merchantOperatorId
+
 
 try {
-  const response = await getAllTransactions(merchantId.value, " ",
+  const response = await getAllTransactions(" ",
     "0",
     "10000000",
     "DESC");
@@ -31,7 +29,7 @@ try {
 const refetch = async () => {
   try {
     isLoading.value = true;
-   const response = await getTransactions(" ",
+   const response = await getAllTransactions(" ",
     "",
     "",
     "DESC");

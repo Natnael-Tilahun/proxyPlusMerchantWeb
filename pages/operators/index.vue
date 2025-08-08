@@ -8,14 +8,12 @@ const {getMerchantOperators} = useOperators()
 const isLoading = ref(false);
 const isError = ref(false);
 const data = ref<Operator[]>([]);
-const merchantId = ref<string>("");
-const authStore = useAuthStore();
-merchantId.value = authStore.profile?.merchantOperatorId
+
 
 const fetchMerchantOperatorsData = async () => {
   try {
     isLoading.value = true;
-    const merchantOperators = await getMerchantOperators(merchantId.value,0,10000);
+    const merchantOperators = await getMerchantOperators(0,10000);
     // Sort integrations by name alphabetically
     data.value = merchantOperators?.sort((a:Operator, b:Operator) => {
       if (a?.fullName && b?.fullName) {

@@ -21,9 +21,6 @@ const loading = ref(false);
 const data = ref<Operator>();
 const merchantOperatorId = ref("");
 const openEditTeminationModal = ref(false);
-const merchantId = ref<string>("")
-const authStore = useAuthStore();
-merchantId.value = authStore.profile?.merchantOperatorId
 
 const setOpenEditTerminationModal = (value: boolean) => {
   openEditTeminationModal.value = value;
@@ -53,7 +50,6 @@ const onSubmit = form.handleSubmit(async (values: any) => {
       newPassword: values.newPassword,
     };
     data.value = await resetMerchantOperatorPassword(
-      merchantId.value,
       merchantOperatorId.value,
       updatedData
     );

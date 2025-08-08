@@ -16,7 +16,6 @@ import type {
   OperatorRole,
   Operator,
 } from "~/types";
-import { useAuthStore } from "~/stores/auth";
 
 const { createNeweMerchantOperator, getMerchantOperatorRoles } = await useOperators();
 const { getBranches } = useBranches();
@@ -25,10 +24,8 @@ const loading = ref(false);
 const data = ref<Operator>();
 const branchesData = ref<Branch[]>([]);
 const merchantRolesData = ref<OperatorRole[]>([]);
-const merchantId = ref<string>("");
 const isSubmitting = ref(false);
-const authStore = useAuthStore();
-merchantId.value = authStore.profile?.merchantOperatorId
+
 
 
 const form = useForm({
@@ -58,7 +55,7 @@ const fetchMerchantsData = async () => {
   try {
     isError.value = false;
     loading.value = true;
-    const response = await getBranches(merchantId.value, 0, 1000);
+    const response = await getBranches(0, 1000);
     branchesData.value = response;
   } catch (err) {
     console.error("Error fetching branches", err);
@@ -87,13 +84,12 @@ const onSubmit = form.handleSubmit(async (values: any) => {
       ...values,
     };
     data.value = await createNeweMerchantOperator(
-      merchantId.value,
       updatedData
     );
     form.setValues({
       ...data.value,
     });
-    navigateTo(`/operators/${data.value?.merchantOperatorId}`);
+    navigateTo(`/operators/operatorDetails/${data.value?.merchantOperatorId}`);
     toast({
       title: "Operator Created",
       description: "Merchant operator created successfully",

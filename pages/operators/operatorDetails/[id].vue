@@ -23,17 +23,10 @@ const loading = ref(false);
 const data = ref<Operator>();
 const branchesData = ref<Branch[]>([]);
 const merchantRolesData = ref<OperatorRole[]>([]);
-
 const operatorId = ref<string>("");
-const merchantId = ref<string>("");
-const route = useRoute();
-
-const authStore = useAuthStore();
-merchantId.value = authStore.profile?.merchantOperatorId
+const isSubmitting = ref(false);
 
 operatorId.value = getIdFromPath()
-
-const isSubmitting = ref(false);
 
 const form = useForm({
   validationSchema: newMerchantOperatorFormSchema,
@@ -44,7 +37,6 @@ const fetchOperatorData = async () => {
     isError.value = false
     loading.value = true;
     data.value = await getMerchantOperatorById(
-      merchantId.value,
       operatorId.value
     );
 
@@ -82,7 +74,7 @@ const fetchMerchantsData = async () => {
     isError.value = false
     loading.value = true;
     const response = await getBranches(
-      merchantId.value,0,1000
+     0,1000
     )
     branchesData.value = response
   } catch (err) {
@@ -114,7 +106,6 @@ const onSubmit = form.handleSubmit(async (values: any) => {
       ...values,
     };
     data.value = await updateMerchantOperator(
-      merchantId.value,
       operatorId.value,
       updatedData
     );

@@ -17,11 +17,7 @@ const { createNeweMerchantBranch } = useBranches();
 const isError = ref(false);
 const loading = ref(false);
 const data = ref<Branch>();
-const merchantId = ref<string>("");
 const isSubmitting = ref(false);
-const authStore = useAuthStore();
-merchantId.value = authStore.profile?.merchantOperatorId
-
 const accountsData = ref<Account[]>([]);
 
 const props = defineProps<{
@@ -49,14 +45,14 @@ const onSubmit = form.handleSubmit(async (values: any) => {
         postalNumber: values?.address?.postalNumber || null,
       },
     };
-    data.value = await createNeweMerchantBranch(merchantId.value, updatedData);
+    data.value = await createNeweMerchantBranch(updatedData);
     form.setValues({
       ...data.value,
       city: data.value?.address?.city || null,
       businessEmail: data.value?.address?.businessEmail || null,
       postalNumber: data.value?.address?.postalNumber || null,
     });
-    navigateTo(`/branches/${data.value?.merchantBranchId}`);
+    navigateTo(`/branches/branchDetails/${data.value?.merchantBranchId}`);
     toast({
       title: "Branch Created",
       description: "Merchant branch created successfully",

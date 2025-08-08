@@ -11,8 +11,7 @@ export const useTransactions = () => {
     const transactionFilterStore = useTransactionFilterStore();
     const { fetch } = useApi();
 
-    const getTransactions: (
-        currentOperatorId?:string,
+    const getMyTransactions: (
         paymentStatus?: string, 
         pageNumber?: string, 
         pageSize?: string, 
@@ -35,7 +34,6 @@ export const useTransactions = () => {
         initiatedDate?: string, 
         completedDate?: string, 
      ) => ApiResult<Transaction[]> = async (
-        currentOperatorId=undefined,
         paymentStatus = undefined, 
         pageNumber = undefined, 
         pageSize = undefined, 
@@ -61,7 +59,7 @@ export const useTransactions = () => {
 
       try {
         const { data, pending, error, status } = await fetch<Transaction[]>(
-          `/api/v1/merchants2/transactions/${currentOperatorId}/mine`,
+          `/api/v1/merchants2/transactions/mine`,
           {
             method: "GET",
             params:{
@@ -143,7 +141,6 @@ export const useTransactions = () => {
     };
 
     const getAllTransactions: (
-      currentOperatorId?:string,
       paymentStatus?: string, 
       pageNumber?: string, 
       pageSize?: string, 
@@ -166,7 +163,6 @@ export const useTransactions = () => {
       initiatedDate?: string, 
       completedDate?: string, 
    ) => ApiResult<Transaction[]> = async (
-      currentOperatorId=undefined,
       paymentStatus = undefined, 
       pageNumber = undefined, 
       pageSize = undefined, 
@@ -196,7 +192,6 @@ export const useTransactions = () => {
         {
           method: "GET",
           params:{
-            currentOperatorId:currentOperatorId,
             ...(paymentStatus || transactionFilterStore.paymentStatus ? {
                 "paymentStatus.equals": paymentStatus ?? transactionFilterStore.paymentStatus == 'NONE' ? '' : transactionFilterStore.paymentStatus
               } : {}),
@@ -274,10 +269,10 @@ export const useTransactions = () => {
     }
   };
 
-    const getMyTransactionById: (currentOperatorId:string, id: string) => ApiResult<Transaction> = async ( currentOperatorId,id) => {
+    const getMyTransactionById: (id: string) => ApiResult<Transaction> = async ( id) => {
       try {
         const { data, pending, error, status } = await fetch<Transaction>(
-          `/api/v1/merchants2/transactions/${currentOperatorId}/mine/${id}`
+          `/api/v1/merchants2/transactions/mine/${id}`
         );
   
         isLoading.value = pending.value;
@@ -294,10 +289,10 @@ export const useTransactions = () => {
 
     };
 
-    const getTransactionById: (currentOperatorId:string, id: string) => ApiResult<Transaction> = async ( currentOperatorId,id) => {
+    const getTransactionById: (id: string) => ApiResult<Transaction> = async ( id) => {
       try {
         const { data, pending, error, status } = await fetch<Transaction>(
-          `/api/v1/merchants2/transactions/${id}?currentOperatorId=${currentOperatorId}`
+          `/api/v1/merchants2/transactions/${id}`
         );
   
         isLoading.value = pending.value;
@@ -333,6 +328,25 @@ export const useTransactions = () => {
       }   
     };
 
+    const getOperatorTransactionsById: (operatorId: string, transactionId:string) => ApiResult<Transaction[]> = async (operatorId,transactionId) => {
+      try {
+        const { data, pending, error, status } = await fetch<Transaction[]>(
+          `/api/v1/merchants2/transactions/operators/${operatorId}/${transactionId}`
+        );
+  
+        isLoading.value = pending.value;
+  
+        if (status.value === "error") {
+          handleApiError(error);
+        }
+  
+        return data.value ? (data.value as unknown as Transaction[]) : null;
+      } catch (err) {
+        // handleApiError(err);
+        return null;
+      }   
+    };
+
     const getTransactionsByBranchId: (branchId: string) => ApiResult<Transaction[]> = async (branchId) => {
       try {
         const { data, pending, error, status } = await fetch<Transaction[]>(
@@ -352,12 +366,33 @@ export const useTransactions = () => {
       }   
     };
 
+    const getBranchTransactionsById: (branchId: string, transactionId:string) => ApiResult<Transaction[]> = async (branchId,transactionId) => {
+      try {
+        const { data, pending, error, status } = await fetch<Transaction[]>(
+          `/api/v1/merchants2/transactions/branch/${branchId}/${transactionId}`
+        );
+  
+        isLoading.value = pending.value;
+  
+        if (status.value === "error") {
+          handleApiError(error);
+        }
+  
+        return data.value ? (data.value as unknown as Transaction[]) : null;
+      } catch (err) {
+        // handleApiError(err);
+        return null;
+      }   
+    };
+
     return {
-        getTransactions,
+        getMyTransactions,
         getTransactionById,
         getTransactionsByOperatorId,
         getTransactionsByBranchId,
         getAllTransactions,
-        getMyTransactionById
+        getMyTransactionById,
+        getOperatorTransactionsById,
+        getBranchTransactionsById
     };
 };

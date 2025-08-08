@@ -2,15 +2,13 @@
 import type { Row } from "@tanstack/vue-table";
 import { toast } from "~/components/ui/toast";
 import { PermissionConstants } from "~/constants/permissions";
-import { getIdFromPath } from "~/lib/utils";
 const { deleteMerchantOperator, isLoading } = useOperators();
 const loading = ref(isLoading.value);
 const isError = ref(false);
 const openEditModal = ref(false);
-const route = useRoute();
 const openSheet = ref(false);
-const merchantId = ref<string>("")
-merchantId.value = getIdFromPath()
+
+
 
 const setOpenEditModal = (value: boolean) => {
   openEditModal.value = value;
@@ -42,7 +40,7 @@ async function deleteMerchantOperators(id: string) {
   try {
     isLoading.value = true;
     loading.value = true;
-    await deleteMerchantOperator(merchantId.value, id); // Call your API function to fetch roles
+    await deleteMerchantOperator(id); // Call your API function to fetch roles
     console.log("Merchant operator deleted successfully");
     toast({
       title: "Merchant operator deleted successfully",

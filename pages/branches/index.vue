@@ -5,20 +5,14 @@ import { columns as tableColumns } from "~/components/branches/columns"; // Rena
 import { PermissionConstants } from "~/constants/permissions";
 
 const { getBranches } = useBranches();
-const route = useRoute();
-const fullPath = ref(route.path);
 const isLoading = ref(false);
 const isError = ref(false);
 const data = ref<Branch[]>([]);
-const merchantId = ref<string>("");
-const authStore = useAuthStore();
-merchantId.value = authStore.profile?.merchantOperatorId
 
 const fetchMerchantBranchesData = async () => {
   try {
     isLoading.value = true;
     const merchantBranches = await getBranches(
-      merchantId.value,
       0,
       10000
     );

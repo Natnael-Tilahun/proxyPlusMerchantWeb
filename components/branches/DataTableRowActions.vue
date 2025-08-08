@@ -6,11 +6,8 @@ const { deleteMerchantBranch, isLoading } = useBranches();
 const loading = ref(isLoading.value);
 const isError = ref(false);
 const openEditModal = ref(false);
-const route = useRoute();
-const openSheet = ref(true);
-const merchantId = ref<string>("");
-const authStore = useAuthStore();
-merchantId.value = authStore.profile?.merchantOperatorId
+
+
 
 const setOpenEditModal = (value: boolean) => {
   openEditModal.value = value;
@@ -34,7 +31,7 @@ async function deleteMerchantBranches(id: string) {
   try {
     isLoading.value = true;
     loading.value = true;
-    await deleteMerchantBranch(merchantId.value, id); // Call your API function to fetch roles
+    await deleteMerchantBranch(id); // Call your API function to fetch roles
     console.log("Merchant branch deleted successfully");
     toast({
       title: "Merchant branch deleted successfully",

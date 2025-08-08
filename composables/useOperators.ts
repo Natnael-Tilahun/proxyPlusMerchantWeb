@@ -8,10 +8,10 @@ export const useOperators = () => {
   const isSubmitting = ref<boolean>(false);
   const { fetch } = useApi();
 
-  const getMerchantOperators: (currentOperatorId:string, page?: number, size?: number) => ApiResult<Operator[]> = async (currentOperatorId, page, size) => {
+  const getMerchantOperators: (page?: number, size?: number) => ApiResult<Operator[]> = async ( page, size) => {
     try {
       const { data, pending, error, status } = await fetch<Operator[]>(
-        `/api/v1/merchants/${currentOperatorId}/operators`,
+        `/api/v1/merchants2/operators`,
         {
           params: { page, size }
         }
@@ -29,10 +29,10 @@ export const useOperators = () => {
     }
   };
 
-  const getMerchantOperatorById: (merchantId: string, id: string) => ApiResult<Operator> = async (merchantId, id) => {
+  const getMerchantOperatorById: (id: string) => ApiResult<Operator> = async ( id) => {
     try {
       const { data, pending, error, status } = await fetch<Operator>(
-        `/api/v1/merchants/${merchantId}/operators/${id}`
+        `/api/v1/merchants2/operators/${id}`
       );
 
       isLoading.value = pending.value;
@@ -47,10 +47,28 @@ export const useOperators = () => {
     }
   };
 
-  const createNeweMerchantOperator: (merchantId: string, operatorData: any) => ApiResult<Operator> = async ( merchantId, operatorData) => {
+  const getMerchantOperatorsByBranchId: (branchId: string) => ApiResult<Operator> = async ( branchId) => {
     try {
       const { data, pending, error, status } = await fetch<Operator>(
-        `/api/v1/merchants/${merchantId}/operators`,
+        `/api/v1/merchants2/operators/by-branch/${branchId}`
+      );
+
+      isLoading.value = pending.value;
+
+      if (status.value === "error") {
+        handleApiError(error);
+      }
+
+      return data.value ? (data.value as unknown as Operator) : null;
+    } catch (err) {
+      throw err
+    }
+  };
+
+  const createNeweMerchantOperator: (operatorData: any) => ApiResult<Operator> = async (  operatorData) => {
+    try {
+      const { data, pending, error, status } = await fetch<Operator>(
+        `/api/v1/merchants2/operators`,
         {
           method: "POST",
           body: operatorData
@@ -69,10 +87,10 @@ export const useOperators = () => {
     }
   };
 
-  const resetMerchantOperatorPassword: (merchantId: string, operatorId: string, operatorData: any) => ApiResult<any> = async ( merchantId, operatorId, operatorData) => {
+  const resetMerchantOperatorPassword: (operatorId: string, operatorData: any) => ApiResult<any> = async (operatorId, operatorData) => {
     try {
       const { data, pending, error, status } = await fetch<any>(
-        `/api/v1/merchants/${merchantId}/operators/${operatorId}/password-reset`,
+        `/api/v1/merchants2/operators/${operatorId}/password-reset`,
         {
           method: "POST",
           body: operatorData
@@ -91,10 +109,10 @@ export const useOperators = () => {
     }
   };
 
-  const updateMerchantOperator: (merchantId: string, operatorId: string, operatorData: any) => ApiResult<Operator> = async (merchantId, operatorId, operatorData) => {
+  const updateMerchantOperator: (operatorId: string, operatorData: any) => ApiResult<Operator> = async ( operatorId, operatorData) => {
     try {
       const { data, pending, error, status } = await fetch<Operator>(
-        `/api/v1/merchants/${merchantId}/operators/${operatorId}`,
+        `/api/v1/merchants2/operators/${operatorId}`,
         {
           method: "PATCH",
           body: operatorData
@@ -113,10 +131,10 @@ export const useOperators = () => {
     }
   };
 
-  const deleteMerchantOperator: (merchantId: string, id: string) => ApiResult<any> = async (merchantId, id) => {
+  const deleteMerchantOperator: (id: string) => ApiResult<any> = async ( id) => {
     try {
       const { data, pending, error, status } = await fetch<any>(
-        `/api/v1/merchants/${merchantId}/operators/${id}`,
+        `/api/v1/merchants2/operators/${id}`,
         { method: "DELETE" }
       );
 
@@ -132,10 +150,10 @@ export const useOperators = () => {
     }
   };
 
-  const sendMerchantOperatorInvite: ( operatorId: string, operatorData: any) => ApiResult<Operator> = async (operatorId, operatorData) => {
+  const sendMerchantOperatorInvite: (  operatorData: any) => ApiResult<Operator> = async ( operatorData) => {
     try {
       const { data, pending, error, status } = await fetch<Operator>(
-        `/api/v1/merchants/${operatorId}/operators/invite`,
+        `/api/v1/merchants2/operators/invite`,
         {
           method: "POST",
           body: operatorData
@@ -154,10 +172,10 @@ export const useOperators = () => {
     }
   };
 
-  const activateMerchantOperator: ( currentOperatorId: string, operatorId: string) => ApiResult<Operator> = async (currentOperatorId, operatorId) => {
+  const activateMerchantOperator: ( operatorId: string) => ApiResult<Operator> = async ( operatorId) => {
     try {
       const { data, pending, error, status } = await fetch<Operator>(
-        `/api/v1/merchants/${currentOperatorId}/operators/${operatorId}/activate`,
+        `/api/v1/merchants2/operators/${operatorId}/activate`,
         {
           method: "PATCH",
         }
@@ -204,6 +222,7 @@ export const useOperators = () => {
     isSubmitting,
     sendMerchantOperatorInvite,
     activateMerchantOperator,
-    getMerchantOperatorRoles
+    getMerchantOperatorRoles,
+    getMerchantOperatorsByBranchId
   };
 };

@@ -12,19 +12,16 @@ import { ref } from "vue";
 import { toast } from "~/components/ui/toast";
 import { PermissionConstants } from "~/constants/permissions";
 import type { Account, Branch } from "~/types";
+import { getIdFromPath } from "~/lib/utils";
 
 const { getBranchById, updateMerchantBranch } = useBranches();
 const isError = ref(false);
 const loading = ref(false);
 const data = ref<Branch>();
-const merchantId = ref<string>("");
 const branchId = ref<string>("");
 const isSubmitting = ref(false);
-const route = useRoute();
-const authStore = useAuthStore();
-merchantId.value = authStore.profile?.merchantOperatorId
 
-branchId.value = route.params.id as string;
+branchId.value = getIdFromPath()
 const accountsData = ref<Account[]>([]);
 
 const props = defineProps<{
@@ -43,7 +40,7 @@ const fetchBranchData = async () => {
   try {
     isError.value = false;
     loading.value = true;
-    data.value = await getBranchById(merchantId.value, branchId.value);
+    data.value = await getBranchById(branchId.value);
     if (data.value) {
       form.setValues({
         ...data.value,
@@ -80,7 +77,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
         postalNumber: values?.postalNumber || null,
       },
     };
-    data.value = await updateMerchantBranch(merchantId.value, branchId.value, updatedData);
+    data.value = await updateMerchantBranch(branchId.value, updatedData);
     form.setValues({
       ...data.value,
       city: data.value?.address?.city || null,

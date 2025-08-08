@@ -5,13 +5,11 @@ import { formatAccountNumber } from "~/lib/formatAccountNumber";
 import type { Transaction } from "~/types";
 
 const route = useRoute();
-const { getTransactionById, getMyTransactionById } = useTransactions();
+const { getTransactionById } = useTransactions();
 const isLoading = ref(false);
 const transactionData = ref<Transaction | null>(null);
 const transactionId = ref<string | null>(null);
-const merchantId = ref<string>("");
-const authStore = useAuthStore();
-merchantId.value = authStore.profile?.merchantOperatorId
+
 
 const { connect, disconnect, receivedMessages, state } = useSocket();
 const openConfirmationModal = ref(false);
@@ -22,7 +20,7 @@ const setOpenConfirmationModal = (value: boolean) => {
 try {
   isLoading.value = true;
   const id = route.params.id as string;
-  transactionData.value = await getTransactionById(merchantId.value, id);
+  transactionData.value = await getTransactionById(id);
   transactionId.value = transactionData.value?.merchantTransactionId;
   if (transactionData.value?.paymentStatus == "PENDING" && transactionData.value?.merchantTransactionId) {
     connect(transactionId.value || "");
@@ -79,23 +77,23 @@ const closeConfirmationModal = () => {
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 md:col-span-2 lg:col-span-3  gap-6 w-full">
         <TransactionsTransactionDetailItem label="Merchant Transaction Id"
-          :value="transactionData.merchantTransactionId" />
-        <TransactionsTransactionDetailItem label="Merchant Id" :value="transactionData.merchantId" />
-        <TransactionsTransactionDetailItem label="Merchant Name" :value="transactionData.merchantName" />
-        <TransactionsTransactionDetailItem label="Merchant City" :value="transactionData.merchantCity" />
-        <TransactionsTransactionDetailItem label="Merchant Branch Id" :value="transactionData.merchantBranchId" />
-        <TransactionsTransactionDetailItem label="Merchant Branch Name" :value="transactionData.merchantBranchName" />
-        <TransactionsTransactionDetailItem label="Operator Id" :value="transactionData.operatorId" />
-        <TransactionsTransactionDetailItem label="Operator Name" :value="transactionData.operatorName" />
+          :value="transactionData?.merchantTransactionId" />
+        <TransactionsTransactionDetailItem label="Merchant Id" :value="transactionData?.merchantId" />
+        <TransactionsTransactionDetailItem label="Merchant Name" :value="transactionData?.merchantName" />
+        <TransactionsTransactionDetailItem label="Merchant City" :value="transactionData?.merchantCity" />
+        <TransactionsTransactionDetailItem label="Merchant Branch Id" :value="transactionData?.merchantBranchId" />
+        <TransactionsTransactionDetailItem label="Merchant Branch Name" :value="transactionData?.merchantBranchName" />
+        <TransactionsTransactionDetailItem label="Operator Id" :value="transactionData?.operatorId" />
+        <TransactionsTransactionDetailItem label="Operator Name" :value="transactionData?.operatorName" />
 
         <TransactionsTransactionDetailItem label="Amount"
           :value="transactionData.amount + ' ' + transactionData.currencyCode" />
-        <TransactionsTransactionDetailItem label="Currency Code" :value="transactionData.currencyCode" />
-        <TransactionsTransactionDetailItem label="PaymentReference" :value="transactionData.paymentReference" />
-        <TransactionsTransactionDetailItem label="Tip Amount" :value="transactionData.tipAmount" />
-        <TransactionsTransactionDetailItem label="Dynamic Id" :value="transactionData.dynamicId" />
+        <TransactionsTransactionDetailItem label="Currency Code" :value="transactionData?.currencyCode" />
+        <TransactionsTransactionDetailItem label="PaymentReference" :value="transactionData?.paymentReference" />
+        <TransactionsTransactionDetailItem label="Tip Amount" :value="transactionData?.tipAmount" />
+        <TransactionsTransactionDetailItem label="Dynamic Id" :value="transactionData?.dynamicId" />
 
-        <TransactionsTransactionDetailItem label="Transaction Status" :value="transactionData.paymentStatus"
+        <TransactionsTransactionDetailItem label="Transaction Status" :value="transactionData?.paymentStatus"
           :status="true" />
         <TransactionsTransactionDetailItem label="Transaction Completed Date"
           :value="formatDate(transactionData.completedDate)" />
@@ -103,14 +101,14 @@ const closeConfirmationModal = () => {
           :value="formatDate(transactionData.expirationDate)" />
         <TransactionsTransactionDetailItem label="Transaction Initiator"
           :value="transactionData.transactionInitiator" />
-        <TransactionsTransactionDetailItem label="MbTransaction Id" :value="transactionData.mbTransactionId" />
-        <TransactionsTransactionDetailItem label="Core Transaction Id" :value="transactionData.coreTransactionId" />
+        <TransactionsTransactionDetailItem label="MbTransaction Id" :value="transactionData?.mbTransactionId" />
+        <TransactionsTransactionDetailItem label="Core Transaction Id" :value="transactionData?.coreTransactionId" />
         <TransactionsTransactionDetailItem label="Merchant Account Number"
-          :value="transactionData.merchantAccountNumber" />
-        <TransactionsTransactionDetailItem label="Payer AccountNumber" :value="transactionData.payerAccountNumber?.length && formatAccountNumber(typeof transactionData.payerAccountNumber === 'string' ? transactionData.payerAccountNumber: '-')" />
-        <TransactionsTransactionDetailItem label="Payer Id" :value="transactionData.payerId" />
-        <TransactionsTransactionDetailItem label="Payer Name" :value="transactionData.payerName" />
-        <TransactionsTransactionDetailItem label="Payer Phone" :value="transactionData.payerPhone" />
+          :value="transactionData?.merchantAccountNumber" />
+        <TransactionsTransactionDetailItem label="Payer AccountNumber" :value="transactionData?.payerAccountNumber?.length && formatAccountNumber(typeof transactionData.payerAccountNumber === 'string' ? transactionData.payerAccountNumber: '-')" />
+        <TransactionsTransactionDetailItem label="Payer Id" :value="transactionData?.payerId" />
+        <TransactionsTransactionDetailItem label="Payer Name" :value="transactionData?.payerName" />
+        <TransactionsTransactionDetailItem label="Payer Phone" :value="transactionData?.payerPhone" />
       </div>
     </UiCard>
 
