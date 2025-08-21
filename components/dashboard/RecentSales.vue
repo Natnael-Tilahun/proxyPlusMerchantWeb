@@ -24,7 +24,7 @@ const isLoading = ref(false);
 const isError = ref(false);
 
 const navigateToTransactionDetail = (id: string) => {
-  router.push(`/transactions/transactionDetails/${id}`);
+  router.push(`/transactions/${id}`);
 };
 
 const getInitials = (name: string) =>

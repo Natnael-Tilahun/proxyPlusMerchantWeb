@@ -8,7 +8,7 @@ const props = defineProps<DataTableRowActionsProps<any>>();
 
 function viewTransactionDetail(id: string) {
   console.log("viewTransactionDetail", id);
-  navigateTo(`/transactions/mine/transactionDetails/${id}`);
+  navigateTo(`/transactions/mine/${id}`);
 }
 </script>
 

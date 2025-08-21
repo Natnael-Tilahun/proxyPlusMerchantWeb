@@ -52,7 +52,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
       businessEmail: data.value?.address?.businessEmail || null,
       postalNumber: data.value?.address?.postalNumber || null,
     });
-    navigateTo(`/branches/branchDetails/${data.value?.merchantBranchId}`);
+    navigateTo(`/branches/${data.value?.merchantBranchId}`);
     toast({
       title: "Branch Created",
       description: "Merchant branch created successfully",

@@ -87,7 +87,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
     form.setValues({
       ...data.value,
     });
-    navigateTo(`/operators/operatorDetails/${data.value?.merchantOperatorId}`);
+    navigateTo(`/operators/${data.value?.merchantOperatorId}`);
     toast({
       title: "Operator Created",
       description: "Merchant operator created successfully",
