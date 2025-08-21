@@ -93,9 +93,6 @@ try {
 
 <template>
   <div class="w-full flex flex-col gap-8">
-    <div class="pt-4">
-      <h1 class="md:text-2xl text-lg font-medium">Profile</h1>
-    </div>
 
     <!-- Loading Indicator -->
     <UiCard class="p-6 space-y-8" v-if="isLoading">

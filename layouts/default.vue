@@ -75,7 +75,7 @@ const closeMenuNav = () => {
 
 <template>
   <div
-    class="w-full h-screen overflow-hidden bg-background dark:bg-gray-900 text-foreground dark:text-gray-100 grid grid-cols-12 lg:grid-cols-9 xl:grid-cols-7"
+    class="w-full h-screen overflow-hidden bg-primary   dark:bg-card text-foreground dark:text-gray-100 grid grid-cols-12 lg:grid-cols-9 xl:grid-cols-7"
     :class="[
       {
         ' relative h-screen  w-full': !isSidebarCollapsed,
@@ -102,10 +102,10 @@ const closeMenuNav = () => {
     />
 
     <div
-      class="col-span-full overflow-scroll md:col-span-9 lg:col-span-7 xl:col-span-6 md:flex"
+      class="col-span-full overflow-scroll md:col-span-9 lg:col-span-7 xl:col-span-6 md:flex bg-gradient-body dark:bg-gradient-body-dark"
       :class="[
         {
-          'w-full   h-full top-0 left-0   flex-col md:flex':
+          'w-full   h-full top-0 left-0   flex-col md:flex md:rounded-tl-2xl md:rounded-bl-2xl':
             !isSidebarCollapsed,
         },
         {
@@ -136,7 +136,7 @@ const closeMenuNav = () => {
               variant="ghost"
               size="icon"
               @click="toggleTheme"
-              class="bg-primary text-primary-foreground hover:bg-gray-300 dark:bg-gray-500 dark:text-white hover:dark:bg-gray-700 rounded-full"
+              class="bg-primary text-primary-foreground hover:bg-gray-300  dark:text-white rounded-full"
             >
               <Icon
                 v-if="colorMode === 'dark'"
@@ -158,7 +158,7 @@ const closeMenuNav = () => {
 
         <UiCard
           v-if="!route.meta.hideBreadcrumb"
-          class="h-16 shadow-sm bg-white flex gap-14 px-5 items-center w-full"
+          class="h-16 shadow-sm flex gap-14 px-5 items-center w-full"
         >
           <!-- <div class="w-0 h-14 rounded-xl -left-2 relative">
             <svg

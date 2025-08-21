@@ -134,7 +134,7 @@ watch(
 </script>
 
 <template>
-  <div class="md:space-y-8 space-y-6 dark:bg-gray-900">
+  <div class="md:space-y-8 space-y-6 ">
     <!-- Loading Indicator Skeleton -->
     <div
       class="grid gap-4 lg:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
@@ -163,7 +163,7 @@ watch(
     >
       <!-- Account list and total balance -->
       <UiCard
-        class="col-span-1 lg:col-span-4 xl:col-span-5 max-h-min shadow-md rounded-3xl dark:bg-gray-800 flex flex-col justify-between relative"
+        class="col-span-1 lg:col-span-4 xl:col-span-5 max-h-min shadow-md rounded-3xl flex flex-col justify-between relative"
       >
         <img
           src="/backgroundMap.png"
@@ -274,7 +274,7 @@ watch(
       <!-- Account Overview -->
       <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION">
       <UiCard
-        class="col-span-1 lg:col-span-4 max-h-[450px] xl:col-span-5 shadow-md rounded-xl dark:bg-gray-800"
+        class="col-span-1 lg:col-span-4 max-h-[450px] xl:col-span-5 shadow-md rounded-xl"
       >
         <UiCardHeader>
           <UiCardTitle>Overview</UiCardTitle>
@@ -288,7 +288,7 @@ watch(
     <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION">
       <!-- Recent Transactions -->
       <UiCard
-        class="col-span-1 lg:col-span-3 max-h-[450px] xl:col-span-4 shadow-md rounded-xl dark:bg-gray-800"
+        class="col-span-1 lg:col-span-3 max-h-[450px] xl:col-span-4 shadow-md rounded-xl"
       >
         <UiCardHeader>
           <div class="flex justify-between w-full items-center">

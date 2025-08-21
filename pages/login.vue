@@ -34,7 +34,7 @@ const clearStaleSessions = () => {
 
 <template>
   <div
-    class="container relative h-[800px] md:h-screen flex flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0"
+    class="container bg-gradient-body rounded-l-3xl relative h-[800px] md:h-screen flex flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0"
   >
     <!-- Background Image Section -->
     <div
@@ -59,7 +59,7 @@ const clearStaleSessions = () => {
       class="md:p-8 p-5 shadow-md rounded-md border-[0.5px] lg:border-none lg:shadow-none"
     >
       <div
-        class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]"
+        class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px] bg-background/50 p-16 shadow-none rounded-md"
       >
         <div class="flex flex-col justify-center items-center space-y-2 text-center">
           <img src="/logo.png" alt="CBE Logo" class="w-20 h-20">

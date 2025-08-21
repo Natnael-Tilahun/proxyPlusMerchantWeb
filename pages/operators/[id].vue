@@ -157,8 +157,8 @@ watch(
     <div v-if="loading" class="py-10 flex justify-center items-center">
       <UiLoading />
     </div>
-    <UiTabs v-model="openItems" class="w-full space-y-0">
-      <UiTabsList class="w-full h-full overflow-x-scroll flex justify-start gap-2 px-0">
+    <UiTabs v-model="openItems" class="w-full space-y-2">
+      <UiTabsList class="w-full h-full overflow-x-scroll flex justify-start gap-2 p-2 bg-card">
         <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR">
           <UiTabsTrigger value="operatorDetails" @click="
             navigateTo({
@@ -168,7 +168,7 @@ watch(
               },
             })
             "
-            class="text-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted-foreground data-[state=inactive]:text-muted rounded-t-lg rounded-b-none">
+            class="text-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border  rounded-t-lg rounded-b-none">
             Operator Details
           </UiTabsTrigger>
         </UiPermissionGuard>
@@ -181,7 +181,7 @@ watch(
               },
             })
             "
-            class="text-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted-foreground data-[state=inactive]:text-muted rounded-t-lg rounded-b-none">
+            class="text-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border  rounded-t-lg rounded-b-none">
             Operator Transactions
           </UiTabsTrigger>
         </UiPermissionGuard>
