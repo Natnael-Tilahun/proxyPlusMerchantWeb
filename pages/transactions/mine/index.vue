@@ -12,6 +12,10 @@ const isError = ref(false);
 const router = useRouter(); // {{ edit_2 }}
 const transactionFilterStore = useTransactionFilterStore();
 
+definePageMeta({
+   hideBreadcrumb: true,
+});
+
 try {
   const response = await getMyTransactions(" ",
     "0",
@@ -52,7 +56,7 @@ const navigateToPrintTransactions = () => {
   <div class="w-full flex flex-col gap-8">
     <div class="flex justify-between pt-4">
       <div>
-        <h1 class="md:text-2xl text-lg font-medium">Transactions</h1>
+        <h1 class="md:text-2xl text-lg font-medium">My Transactions</h1>
         <p class="text-sm text-muted-foreground">
           View and manage transactions
         </p>

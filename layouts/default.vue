@@ -5,12 +5,16 @@ import Sidebar from "~/components/layout/sidebar/Sidebar.vue";
 import OpenSidebarIcon from "~/components/layout/sidebar/OpenSidebarIcon.vue";
 import CloseSidebarIcon from "~/components/layout/sidebar/CloseSidebarIcon.vue";
 
+
 const LOCAL_STORAGE_THEME_KEY = "theme";
 
 const route = useRoute();
 const fullPath = ref(route.path);
 const pathSegments = ref([]);
 pathSegments.value = splitPath(fullPath.value);
+
+console.log("route.meta.hideBreadcrumb: ", route.meta.hideBreadcrumb)
+
 
 watch(
   () => route.path,
@@ -153,6 +157,7 @@ const closeMenuNav = () => {
         </div>
 
         <UiCard
+          v-if="!route.meta.hideBreadcrumb"
           class="h-16 shadow-sm bg-white flex gap-14 px-5 items-center w-full"
         >
           <!-- <div class="w-0 h-14 rounded-xl -left-2 relative">

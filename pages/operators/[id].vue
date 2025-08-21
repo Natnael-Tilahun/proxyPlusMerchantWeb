@@ -20,6 +20,10 @@ const { getMerchantOperatorById, updateMerchantOperator, getMerchantOperatorRole
   await useOperators();
 const { getBranches } = useBranches()
 
+definePageMeta({
+   hideBreadcrumb: true,
+});
+
 const route = useRoute();
 const isError = ref(false);
 const isMerchantError = ref(false);
@@ -99,14 +103,6 @@ onMounted(async () => {
   await fetchMerchantsData()
   await fetchOperatorRolesData()
   await fetchOperatorData();
-  console.log("openItems",openItems.value)
-console.log("data",data.value)
-console.log("isError",isError.value)
-console.log("loading",loading.value)
-console.log("isRolesError",isRolesError.value)
-console.log("isMerchantError",isMerchantError.value)
-console.log("rolesLoading",rolesLoading.value)
-console.log("merchantLoading",merchantLoading.value)
 });
 
 const refetch = async () => {

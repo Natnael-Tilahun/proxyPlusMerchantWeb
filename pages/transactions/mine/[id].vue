@@ -9,7 +9,9 @@ const { getMyTransactionById } = useTransactions();
 const isLoading = ref(false);
 const transactionData = ref<Transaction | null>(null);
 const transactionId = ref<string | null>(null);
-
+  definePageMeta({
+   hideBreadcrumb: true,
+});
 
 const { connect, disconnect, receivedMessages, state } = useSocket();
 const openConfirmationModal = ref(false);

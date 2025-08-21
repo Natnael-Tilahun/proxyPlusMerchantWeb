@@ -15,6 +15,10 @@ import type { Account, Branch } from "~/types";
 import { getIdFromPath } from "~/lib/utils";
 const openItems = ref(["branchDetails"]);
 
+definePageMeta({
+   hideBreadcrumb: true,
+});
+
 const { getBranchById, updateMerchantBranch } = useBranches();
 const route = useRoute();
 
