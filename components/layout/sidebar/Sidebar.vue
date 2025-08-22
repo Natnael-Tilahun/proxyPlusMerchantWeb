@@ -124,8 +124,7 @@ const closeMenuNav = () => {
 };
 
 const hasVisibleDropdownItems = (link: MenuItem) => {
-  console.log("hasVisibleDropdownItems: ", link)
-  return link.dropdown?.some((item) => (authStore as any).hasPermissions(item.permission ?? ''));
+  return link.dropdown?.some((item) => useHasPermissions(item.permission ?? ''));
 };
 
 function isRouteActive(path: string) {

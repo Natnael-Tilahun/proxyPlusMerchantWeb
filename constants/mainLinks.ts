@@ -16,8 +16,8 @@ export const mainLinks: MenuItem[] = [
     size: "22",
     showDropdown: false,
     dropdown: [
-      { title: "Mine", link: "/transactions/mine", permission: PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION},
-      { title: "All Transactions", link: "/transactions", permission: PermissionConstants.READ_MERCHANT_TRANSACTION},
+      { title: "Mine", link: "/transactions/mine", permission: ""},
+      { title: "All Merchant Transactions", link: "/transactions", permission: PermissionConstants.READ_MERCHANT_TRANSACTION},
     ],
   },
   {

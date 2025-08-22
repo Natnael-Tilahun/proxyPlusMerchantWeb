@@ -237,6 +237,6 @@ export interface MenuItem {
   dropdown?: {
     title: string;
     link: string;
-    permission: string;
+    permission?: string;
   }[];
 }

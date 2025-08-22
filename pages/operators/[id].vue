@@ -7,7 +7,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { newMerchantOperatorFormSchema } from "~/validations/newMerchantOperatorFormSchem";
+import { updateMerchantOperatorFormSchema } from "~/validations/updateMerchantOperatorFormSchema";
 import { ref } from "vue";
 import { toast } from "~/components/ui/toast";
 import { PermissionConstants } from "~/constants/permissions";
@@ -43,7 +43,7 @@ openItems.value = activeTab || "operatorDetails";
 operatorId.value = getIdFromPath()
 
 const form = useForm({
-  validationSchema: newMerchantOperatorFormSchema,
+  validationSchema: updateMerchantOperatorFormSchema,
 });
 
 const fetchOperatorData = async () => {
@@ -258,6 +258,7 @@ watch(
                       <FormControl>
                         <UiSwitch :checked="value" @update:checked="handleChange" />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   </FormField>
 

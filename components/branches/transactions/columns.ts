@@ -1,5 +1,5 @@
 import type { ColumnDef } from "@tanstack/vue-table";
-import { Checkbox } from "../ui/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 import DataTableColumnHeaderVue from "~/components/ui/dataTable/ColumnHeader.vue";
 import TransactionsDataTableRowActionsVue from "./DataTableRowActions.vue";
 import { NuxtLink } from "#components";
@@ -37,7 +37,7 @@ export const columns: ColumnDef<Transaction>[] = [
         {
           class:
             "font-medium text-primary w-fit whitespace-nowrap truncate hover:w-full",
-          to: `/transactions/${merchantTransactionId}`
+          to: `${route.path}?activeTab=transactionDetails&transactionId=${merchantTransactionId}`
         },
         payerName || "View"
       ) 

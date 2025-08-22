@@ -210,7 +210,7 @@ const clearFilter = () => {
           </UiSelect>
         </div>
 
-        <!-- <div class="space-y-1">
+        <div class="space-y-1">
           <label for="paymentInitiator" class="text-sm"
             >Payment Initiator</label
           >
@@ -232,7 +232,7 @@ const clearFilter = () => {
               </UiSelectItem>
             </UiSelectContent>
           </UiSelect>
-        </div> -->
+        </div>
         <!-- 
         <div class="space-y-1">
           <label for="branch" class="text-sm">{{ $t("branch") }}</label>

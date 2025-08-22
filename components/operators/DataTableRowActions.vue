@@ -69,7 +69,7 @@ async function deleteMerchantOperators(id: string) {
         <span class="sr-only">Open menu</span>
       </UiButton>
     </UiDropdownMenuTrigger>
-    <UiDropdownMenuContent align="end" class="w-[160px]">
+    <UiDropdownMenuContent align="end" class="w-[200px]">
       <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR">
         <UiDropdownMenuItem
           @click="viewMerchantOperatorDetail(row.original.merchantOperatorId)"
@@ -83,14 +83,14 @@ async function deleteMerchantOperators(id: string) {
         <UiSheet :open="openSheet" :onOpenChange="setOpenSheet">
           <UiSheetTrigger
             @click="setOpenSheet(true)"
-            class="cursor-pointer text-sm text-left px-2"
+            class="cursor-pointer text-sm text-left px-2  whitespace-nowrap"
           >
-            Reset Operator Password
+            Reset Operator Passwordd
           </UiSheetTrigger>
           <UiSheetContent
-            class="md:min-w-[75%] sm:min-w-full flex flex-col h-full overflow-y-auto"
+          class="md:min-w-[75%] sm:min-w-full flex flex-col h-full overflow-y-auto"
           >
-            <MerchantsOperatorsResetPasswordSheet
+            <OperatorsResetPasswordSheet
               @close="closeSheet"
               :merchantOperatorIdProps="row.original.merchantOperatorId"
             />

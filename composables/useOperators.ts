@@ -90,7 +90,7 @@ export const useOperators = () => {
   const resetMerchantOperatorPassword: (operatorId: string, operatorData: any) => ApiResult<any> = async (operatorId, operatorData) => {
     try {
       const { data, pending, error, status } = await fetch<any>(
-        `/api/v1/merchants2/operators/${operatorId}/password-reset`,
+        `/api/v1/merchants2/operators/${operatorId}/reset-password`,
         {
           method: "POST",
           body: operatorData

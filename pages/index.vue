@@ -4,7 +4,7 @@ import { Icons } from "~/components/icons";
 import type { Transaction } from "~/types";
 import { PermissionConstants } from "~/constants/permissions";
 
-const { getAllTransactions } = useTransactions();
+const { getAllTransactions, getMyTransactions } = useTransactions();
 const isLoading = ref(true);
 const transactionData = ref<Transaction[]>([]);
 const todaysTransactions = ref<Transaction[]>([]);
@@ -101,14 +101,19 @@ try {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   yesterday.setHours(0, 0, 0, 0);
-  transactionData.value = await getAllTransactions(
-    " ",
+  // transactionData.value = await getAllTransactions(
+  //   " ",
+  //   "0",
+  //   "100000000000",
+  //   "DESC",
+  //   // `${yesterday.toISOString()}`
+  // ) || [];
+   const response = await getMyTransactions(" ",
     "0",
-    "10000000",
-    "DESC",
-    // `${yesterday.toISOString()}`
-  ) || [];
-  todaysTransactions.value = transactionData.value.filter((transaction) => {
+    "1000000000",
+    "DESC");
+    transactionData.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
+    todaysTransactions.value = transactionData.value.filter((transaction) => {
     const transactionDate = new Date(transaction.expirationDate); // Assuming 'date' is the field for transaction date
     const today = new Date();
     return (
@@ -272,7 +277,7 @@ watch(
       class="grid gap-4 md:gap-8 max-h-[400px] grid-cols-1 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-9"
     >
       <!-- Account Overview -->
-      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION">
+      <!-- <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION"> -->
       <UiCard
         class="col-span-1 lg:col-span-4 max-h-[450px] xl:col-span-5 shadow-md rounded-xl"
       >
@@ -283,9 +288,9 @@ watch(
           <DashboardOverview :transactionData="transactionData" />
         </UiCardContent>
       </UiCard>
-      </UiPermissionGuard>
+      <!-- </UiPermissionGuard> -->
 
-    <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION">
+    <!-- <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION"> -->
       <!-- Recent Transactions -->
       <UiCard
         class="col-span-1 lg:col-span-3 max-h-[450px] xl:col-span-4 shadow-md rounded-xl"
@@ -307,7 +312,7 @@ watch(
           <DashboardRecentSales :transactionData="transactionData" />
         </UiCardContent>
       </UiCard>
-      </UiPermissionGuard>
+      <!-- </UiPermissionGuard> -->
     </div>
   </div>
 </template>

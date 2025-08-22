@@ -19,10 +19,10 @@ definePageMeta({
 try {
   const response = await getMyTransactions(" ",
     "0",
-    "10000000",
+    "1000000000",
     "DESC");
     data.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime());
-} catch (error) {
+  } catch (error) {
   console.error("Error fetching transactions:", error);
   isError.value = true;
 } finally {
