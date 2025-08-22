@@ -14,7 +14,7 @@ import { PermissionConstants } from "~/constants/permissions";
 import type { Branch, Operator, OperatorRole } from "~/types";
 import { getIdFromPath } from "~/lib/utils";
 import ErrorMessage from "~/components/ui/errorMessage/ErrorMessage.vue";
-const openItems = ref(["branchDetails"]);
+const openItems = ref("operatorDetails");
 
 const { getMerchantOperatorById, updateMerchantOperator, getMerchantOperatorRoles } =
   await useOperators();
@@ -100,6 +100,7 @@ const fetchMerchantsData = async () => {
 };
 
 onMounted(async () => {
+  isError.value = false
   await fetchMerchantsData()
   await fetchOperatorRolesData()
   await fetchOperatorData();
@@ -154,9 +155,6 @@ watch(
 
 <template>
   <div class="w-full flex flex-col gap-8">
-    <div v-if="loading" class="py-10 flex justify-center items-center">
-      <UiLoading />
-    </div>
     <UiTabs v-model="openItems" class="w-full space-y-2">
       <UiTabsList class="w-full h-full overflow-x-scroll flex justify-start gap-2 p-2 bg-card">
         <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR">
@@ -184,11 +182,26 @@ watch(
             class="text-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border  rounded-t-lg rounded-b-none">
             Operator Transactions
           </UiTabsTrigger>
+          <UiTabsTrigger value="transactionDetails" @click="
+            navigateTo({
+              path: route.path,
+              query: {
+                activeTab: 'transactionDetails',
+              },
+            })
+            "
+            :disabled="openItems != 'transactionDetails'"
+            class="text-lg data-[state=active]:bg-primary  data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border  rounded-t-lg rounded-b-none data-[state=inactive]:hidden">
+            Transactions Details
+          </UiTabsTrigger>
         </UiPermissionGuard>
       </UiTabsList>
       <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR">
         <UiTabsContent  value="operatorDetails" class="text-base bg-background p-6 rounded-lg border">
-          <UiCard v-if="data && !isError"  class="w-full flex border-[1px] rounded-lg h-full">
+          <div v-if="loading" class="py-10 flex justify-center items-center">
+      <UiLoading />
+    </div>
+          <UiCard v-if="data && !isError && !loading"  class="w-full flex border-[1px] rounded-lg h-full">
             <div class="text-sm md:text-base p-6 basis-full">
               <form @submit="onSubmit">
                 <div class="grid grid-cols-2 gap-6">
@@ -312,7 +325,7 @@ watch(
               </form>
             </div>
           </UiCard>
-              <div v-else-if="isError || data == null || data == undefined">
+              <div v-else-if="(isError && !loading)">
       <ErrorMessage :retry="refetch" title="Something went wrong." />
     </div>
         </UiTabsContent>
@@ -321,6 +334,9 @@ watch(
       <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION">
         <UiTabsContent value="operatorTransactions" class="text-base bg-background border p-6 h-full rounded-lg">
           <OperatorsTransactions />
+        </UiTabsContent>
+        <UiTabsContent value="transactionDetails" class="text-base bg-background border p-6 h-full rounded-lg">
+          <OperatorsTransactionsDetails />
         </UiTabsContent>
       </UiPermissionGuard>
     </UiTabs>

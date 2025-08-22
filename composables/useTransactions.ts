@@ -312,7 +312,7 @@ export const useTransactions = () => {
     const getTransactionsByOperatorId: (operatorId: string) => ApiResult<Transaction[]> = async (operatorId) => {
       try {
         const { data, pending, error, status } = await fetch<Transaction[]>(
-          `/api/v1/merchants2/transactions/operators/${operatorId}`
+          `/api/v1/merchants2/transactions/operator/${operatorId}`
         );
   
         isLoading.value = pending.value;

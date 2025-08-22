@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import type { Operator } from "~/types";
-import { columns as tableColumns } from "~/components/operators/columns"; // Renamed to avoid conflict
+import { columns as tableColumns } from "~/components/branches/operators/columns"; // Renamed to avoid conflict
 import { PermissionConstants } from "~/constants/permissions";
 import { getIdFromPath } from "~/lib/utils";
 
@@ -82,7 +82,7 @@ const columns = computed(() => tableColumns(refetch));
   </div>
   <div
     v-else-if="data && !isError"
-    class="py-5 flex flex-col space-y-10 mx-auto"
+    class="py-5 flex flex-col space-y-10"
   >
     <UiDataTable :columns="columns" :data="data">
       <template v-slot:toolbar="{ table }">

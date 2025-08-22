@@ -60,7 +60,7 @@ export const columns = (
         ? h(
             "div",
             {
-              class: "whitespace-nowrap truncate hover:w-full font-medium",
+              class: "whitespace-nowrap truncate hover:w-full",
             },
             row.getValue("operatorCode")
           )
@@ -74,11 +74,9 @@ export const columns = (
       const roleName = row.original?.operatorRoleId;
       return roleName
         ? h(
-            NuxtLink,
+            "div",
             {
-              class:
-                "font-medium text-primary w-fit whitespace-nowrap truncate hover:w-full",
-              to: `/merchantRoles/${roleName}`,
+              class: "whitespace-nowrap truncate hover:w-full",
             },
             row.getValue("operatorRoleId")
           )

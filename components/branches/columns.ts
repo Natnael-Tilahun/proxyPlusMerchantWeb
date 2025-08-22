@@ -59,7 +59,7 @@ export const columns = (
         ? h(
             "div",
             {
-              class: "whitespace-nowrap truncate hover:w-full font-medium",
+              class: "whitespace-nowrap truncate hover:w-full",
             },
             row.getValue("branchCode")
           )
@@ -75,7 +75,7 @@ export const columns = (
         ? h(
             "div",
             {
-              class: "whitespace-nowrap truncate hover:w-full font-medium",
+              class: "whitespace-nowrap truncate hover:w-full",
             },
             row.getValue("businessPhoneNumber")
           )

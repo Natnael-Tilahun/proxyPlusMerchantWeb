@@ -158,6 +158,18 @@ watch(
         >
           Branch Transactions
         </UiTabsTrigger>
+        <UiTabsTrigger value="transactionDetails" @click="
+            navigateTo({
+              path: route.path,
+              query: {
+                activeTab: 'transactionDetails',
+              },
+            })
+            "
+            :disabled="openItems != 'transactionDetails'"
+            class="text-lg data-[state=active]:bg-primary  data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border  rounded-t-lg rounded-b-none data-[state=inactive]:hidden">
+            Transactions Details
+          </UiTabsTrigger>
         </UiPermissionGuard>
   <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR" >
         <UiTabsTrigger
@@ -174,6 +186,18 @@ watch(
         >
           Branch Operators
         </UiTabsTrigger>
+        <UiTabsTrigger value="operatorDetails" @click="
+            navigateTo({
+              path: route.path,
+              query: {
+                activeTab: 'operatorDetails',
+              },
+            })
+            "
+            :disabled="openItems != 'operatorDetails'"
+            class="text-lg data-[state=active]:bg-primary  data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border  rounded-t-lg rounded-b-none data-[state=inactive]:hidden">
+            Operator Details
+          </UiTabsTrigger>
         </UiPermissionGuard>
       </UiTabsList>
       <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_BRANCH" >
@@ -357,14 +381,20 @@ watch(
       >
         <BranchesTransactions        />
       </UiTabsContent>
+      <UiTabsContent value="transactionDetails" class="text-base bg-background border p-6 h-full rounded-lg">
+          <BranchesTransactionsDetails />
+        </UiTabsContent>
       </UiPermissionGuard>
       <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR" >
       <UiTabsContent
         value="branchOperators"
         class="text-base bg-background border p-6 h-full rounded-lg"
       >
-        <BranchesOperators        />
+        <BranchesOperators />
       </UiTabsContent>
+      <UiTabsContent value="operatorDetails" class="text-base bg-background border p-6 h-full rounded-lg">
+          <BranchesOperatorsDetails />
+        </UiTabsContent>
       </UiPermissionGuard>
 </UiTabs>
     <UiCard

@@ -44,7 +44,7 @@ export const columns = (
             {
               class:
                 "font-medium text-primary w-fit whitespace-nowrap truncate hover:w-full",
-              to: `/operators/${merchantOperatorId}`,
+              to: `${route.path}?activeTab=operatorDetails&operatorId=${merchantOperatorId}`,
             },
             fullName ? fullName : "View Operator"
           )
