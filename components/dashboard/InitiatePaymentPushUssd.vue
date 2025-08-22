@@ -37,7 +37,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
         description: data,
         variant: "default",
       });
-      navigateTo(`/transactions/${props.merchantTransactionId}`, { replace: true });
+      navigateTo(`/transactions/mine/${props.merchantTransactionId}`, { replace: true });
     }
   } catch (error) {
     console.error("Login error: ", error);

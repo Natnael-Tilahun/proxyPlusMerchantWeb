@@ -120,10 +120,7 @@ watch(
 
 <template>
   <div class="w-full flex flex-col gap-8">
-    <div v-if="loading" class="py-10 flex justify-center items-center">
-      <UiLoading />
-    </div>
-      <UiTabs v-if="data && !isError" v-model="openItems" class="w-full space-y-2">
+      <UiTabs v-model="openItems" class="w-full space-y-2">
       <UiTabsList
         class="w-full h-full overflow-x-scroll flex justify-start gap-2 p-2  bg-card"
       >
@@ -205,7 +202,10 @@ watch(
         value="branchDetails"
         class="text-base bg-background p-6 rounded-lg border"
       >
-      <UiCard
+      <div v-if="loading" class="py-10 flex justify-center items-center">
+      <UiLoading />
+    </div>
+      <UiCard v-else-if="data && !isError"
       class="w-full flex border-[1px] rounded-lg h-full"
     >
       <div class="text-sm md:text-base p-6 basis-full">
@@ -372,31 +372,6 @@ watch(
         </form>
       </div>
     </UiCard>
-      </UiTabsContent>
-      </UiPermissionGuard>
-      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_BRANCH_TRANSACTION" >
-      <UiTabsContent
-        value="branchTransactions"
-        class="text-base bg-background border p-6 h-full rounded-lg"
-      >
-        <BranchesTransactions        />
-      </UiTabsContent>
-      <UiTabsContent value="transactionDetails" class="text-base bg-background border p-6 h-full rounded-lg">
-          <BranchesTransactionsDetails />
-        </UiTabsContent>
-      </UiPermissionGuard>
-      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR" >
-      <UiTabsContent
-        value="branchOperators"
-        class="text-base bg-background border p-6 h-full rounded-lg"
-      >
-        <BranchesOperators />
-      </UiTabsContent>
-      <UiTabsContent value="operatorDetails" class="text-base bg-background border p-6 h-full rounded-lg">
-          <BranchesOperatorsDetails />
-        </UiTabsContent>
-      </UiPermissionGuard>
-</UiTabs>
     <UiCard
       v-else-if="data && !isError"
       class="w-full flex border-[1px] rounded-lg h-full"
@@ -571,5 +546,30 @@ watch(
     <div v-else-if="isError || data == null || data == undefined">
       <ErrorMessage :retry="refetch" title="Something went wrong." />
     </div>
+      </UiTabsContent>
+      </UiPermissionGuard>
+      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_BRANCH_TRANSACTION" >
+      <UiTabsContent
+        value="branchTransactions"
+        class="text-base bg-background border p-6 h-full rounded-lg"
+      >
+        <BranchesTransactions/>
+      </UiTabsContent>
+      <UiTabsContent value="transactionDetails" class="text-base bg-background border p-6 h-full rounded-lg">
+          <BranchesTransactionsDetails />
+        </UiTabsContent>
+      </UiPermissionGuard>
+      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR" >
+      <UiTabsContent
+        value="branchOperators"
+        class="text-base bg-background border p-6 h-full rounded-lg"
+      >
+        <BranchesOperators />
+      </UiTabsContent>
+      <UiTabsContent value="operatorDetails" class="text-base bg-background border p-6 h-full rounded-lg">
+          <BranchesOperatorsDetails />
+        </UiTabsContent>
+      </UiPermissionGuard>
+</UiTabs>
   </div>
 </template>

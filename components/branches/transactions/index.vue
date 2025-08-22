@@ -8,7 +8,7 @@ import { getIdFromPath } from "~/lib/utils";
 
 const { getAllTransactions, getTransactionsByBranchId } = useTransactions();
 const data = ref<Transaction[]>([]);
-const isLoading = ref(true);
+const isLoading = ref(false);
 const isError = ref(false);
 const router = useRouter(); // {{ edit_2 }}
 const transactionFilterStore = useTransactionFilterStore();
@@ -19,6 +19,7 @@ console.log("branchid",branchId.value);
 
 
 try {
+  isLoading.value = true
   const response = await getTransactionsByBranchId(branchId.value);
     data.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime()) ;
 } catch (error) {
@@ -73,7 +74,7 @@ const navigateToPrintTransactions = () => {
       <UiLoading />
     </div>
 
-    <UiCard v-else-if="data && !isError" class="p-6">
+    <UiCard v-else-if="data && !isError && !isLoading" class="p-6">
       <UiDataTable :columns="columns" :data="data">
         <template v-slot:toolbar="{ table }">
           <TransactionsDataTableFilterbar :refetch="refetch" :table="table" />
