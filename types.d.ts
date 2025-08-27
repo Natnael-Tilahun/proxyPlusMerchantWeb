@@ -179,9 +179,12 @@ export interface VerificationRequest {
 
 
 interface AuthResponse {
+  operatorDTO : {},
+  tokenDTO : {
   accessToken?: string;
   refreshToken?: string;
   permissions?: string[];
+  }
 }
 
 interface Operator {
@@ -238,5 +241,6 @@ export interface MenuItem {
     title: string;
     link: string;
     permission?: string;
+    effectiveToAllBranch?: boolean
   }[];
 }

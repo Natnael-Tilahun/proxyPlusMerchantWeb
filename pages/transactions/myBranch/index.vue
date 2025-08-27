@@ -1,28 +1,32 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { columns } from "~/components/transactions/columns";
+import { columns } from "~/components/myBranchTransactions/columns";
 import { useTransactions } from "~/composables/useTransactions";
 import { useRouter } from "vue-router"; // {{ edit_1 }}
 import type { Transaction } from "~/types";
 
-const { getAllTransactions } = useTransactions();
+const { getTransactionsByBranchId } = useTransactions();
 const data = ref<Transaction[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
 const router = useRouter(); // {{ edit_2 }}
 const transactionFilterStore = useTransactionFilterStore();
+const myBranchId = ref<string>()
+const store = useAuthStore()
+myBranchId.value = store.profile?.merchantBranch?.merchantBranchId
+
 definePageMeta({
    hideBreadcrumb: true,
 });
 
 try {
-  const response = await getAllTransactions(" ",
+  const response = await getTransactionsByBranchId(myBranchId.value, " ",
     "0",
-    "10000000",
+    "1000000000",
     "DESC");
     data.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime());
-} catch (error) {
-  console.error("Error fetching transactions:", error);
+  } catch (error) {
+  console.error("Error fetching branch transactions:", error);
   isError.value = true;
 } finally {
   isLoading.value = false;
@@ -31,13 +35,13 @@ try {
 const refetch = async () => {
   try {
     isLoading.value = true;
-   const response = await getAllTransactions(" ",
+   const response = await getTransactionsByBranchId(myBranchId.value, " ",
     "",
     "",
     "DESC");
     data.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
   } catch (error) {
-    console.error("Error fetching transactions:", error);
+    console.error("Error fetching branch transactions:", error);
     isError.value = true;
   } finally {
     isLoading.value = false;
@@ -55,7 +59,7 @@ const navigateToPrintTransactions = () => {
   <div class="w-full flex flex-col gap-8">
     <div class="flex justify-between pt-4">
       <div>
-        <h1 class="md:text-2xl text-lg font-medium">All Branch Transactions</h1>
+        <h1 class="md:text-2xl text-lg font-medium">My Branch Transactions</h1>
         <p class="text-sm text-muted-foreground">
           View and manage transactions
         </p>

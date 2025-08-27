@@ -16,24 +16,59 @@ export const mainLinks: MenuItem[] = [
     size: "22",
     showDropdown: false,
     dropdown: [
-      { title: "Mine", link: "/transactions/mine", permission: ""},
-      { title: "All Merchant Transactions", link: "/transactions", permission: PermissionConstants.READ_MERCHANT_TRANSACTION},
+      { title: "My Transactions", link: "/transactions/mine", permission: "" },
+      {
+        title: "My Branch Transactions",
+        link: "/transactions/myBranch",
+        permission: PermissionConstants.READ_MERCHANT_BRANCH_TRANSACTION,
+      },
+      {
+        title: "All Transactions",
+        link: "/transactions",
+        permission: PermissionConstants.READ_MERCHANT_TRANSACTION,
+      },
     ],
   },
   {
     title: "Operators",
     icon: "uil:users-alt",
-    link: "/operators",
+    // link: "/operators",
     size: "22",
     showDropdown: false,
-    permission: PermissionConstants.READ_MERCHANT_OPERATOR
+    // permission: PermissionConstants.READ_MERCHANT_OPERATOR
+    dropdown: [
+      {
+        title: "My Branch Operators",
+        link: "/operators/myBranch",
+        permission: PermissionConstants.READ_MERCHANT_OPERATOR,
+      },
+      {
+        title: "All Branch Operators",
+        link: "/operators",
+        permission: PermissionConstants.READ_MERCHANT_OPERATOR,
+        effectiveToAllBranch: true,
+      },
+    ],
   },
   {
     title: "Branches",
     icon: "material-symbols:partner-exchange-outline-rounded",
-    link: "/branches",
+    // link: "/branches",
     size: "22",
     showDropdown: false,
-    permission: PermissionConstants.READ_MERCHANT_BRANCH
-  }
+    // permission: PermissionConstants.READ_MERCHANT_BRANCH
+    dropdown: [
+      {
+        title: "My Branch",
+        link: "/branches/mine",
+        permission: PermissionConstants.READ_MERCHANT_BRANCH,
+      },
+      {
+        title: "All Branches",
+        link: "/branches",
+        permission: PermissionConstants.READ_MERCHANT_BRANCH,
+        effectiveToAllBranch: true,
+      },
+    ],
+  },
 ];

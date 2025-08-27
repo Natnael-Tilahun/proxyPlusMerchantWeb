@@ -93,11 +93,30 @@
 </template>
 
 <script lang="ts" setup>
-import { mainLinks } from "~/constants/mainLinks";
+import { mainLinks as allMainLinks } from "~/constants/mainLinks";
 import type { MenuItem } from "~/types";
 const { logout } = useAuth();
 const authStore = useAuthStore();
 const route = useRoute();
+
+const mainLinks = computed(() => {
+  const isForAllBranch = authStore.role?.effectiveToAllBranch;
+
+  if (isForAllBranch) {
+    return allMainLinks;
+  }
+
+  return allMainLinks.map((link) => {
+    if (link.dropdown) {
+      const newLink = { ...link };
+      newLink.dropdown = newLink.dropdown.filter(
+        (item) => !(item as any).effectiveToAllBranch
+      );
+      return newLink;
+    }
+    return link;
+  });
+});
 
 const logoutHandler = async () => {
   logout().then((data) => {
@@ -115,7 +134,7 @@ const logoutHandler = async () => {
 };
 
 // Initialize isOpen array with the same length as mainLinks and set all to false
-const isOpen = ref(new Array(mainLinks.length).fill(false));
+const isOpen = ref(new Array(allMainLinks.length).fill(false));
 
 const emits = defineEmits(["closeMenuNav"]); // Define custom event
 
@@ -124,7 +143,7 @@ const closeMenuNav = () => {
 };
 
 const hasVisibleDropdownItems = (link: MenuItem) => {
-  return link.dropdown?.some((item) => useHasPermissions(item.permission ?? ''));
+  return link.dropdown?.some((item) => useHasPermissions(item.permission ?? ""));
 };
 
 function isRouteActive(path: string) {

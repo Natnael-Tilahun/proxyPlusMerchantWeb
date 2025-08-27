@@ -218,7 +218,7 @@ try {
           </FormField>
           <FormField
             v-slot="{ componentField }"
-            name="paymentReceivingAccountNumber"
+            name="merchant.defaultPaymentReceivingAccountNumber"
           >
             <FormItem>
               <FormLabel> Branch Payment Receiving Account Number </FormLabel>

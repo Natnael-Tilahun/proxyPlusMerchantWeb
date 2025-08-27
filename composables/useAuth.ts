@@ -30,15 +30,15 @@ export const useAuth = () => {
       if (status.value === "success") {
         store.setAuth({
           ...user,
-          ...data?.value,
-          isAuthenticated: data?.value?.accessToken ? true : false,
+          ...data?.value?.tokenDTO,
+          isAuthenticated: data?.value?.tokenDTO?.accessToken ? true : false,
         });
-        const profileResponse =  await getProfile();   
-        if(profileResponse){
-          store.setProfile(profileResponse)
-        }    
-        if(profileResponse?.merchantOperatorId){
-          const authoritiesResponse =  await getAuthorities(profileResponse?.merchantOperatorId); 
+        // const profileResponse =  await getProfile();   
+        // if(profileResponse){
+          store.setProfile(data.value?.operatorDTO)
+        // }    
+        if(data.value?.operatorDTO?.merchantOperatorId){
+          const authoritiesResponse =  await getAuthorities(data.value?.operatorDTO?.merchantOperatorId); 
         } 
     
         // if(authoritiesResponse){
