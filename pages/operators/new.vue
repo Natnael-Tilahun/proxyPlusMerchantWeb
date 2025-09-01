@@ -199,6 +199,9 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                       <UiSelectItem v-for="item in branchesData" :value="item.merchantBranchId">
                         {{ item.branchName }}
                       </UiSelectItem>
+                      <UiSelectItem value="None">
+                        None
+                      </UiSelectItem>
                     </UiSelectGroup>
                     <UiSelectGroup v-else>
                       <UiSelectItem value="No branches found">

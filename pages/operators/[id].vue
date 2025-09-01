@@ -120,6 +120,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
     const updatedData = {
       ...data.value,
       ...values,
+      merchantBranchId: values.merchantBranchId === "None" ? null : values.merchantBranchId,
     };
     data.value = await updateMerchantOperator(
       operatorId.value,
@@ -297,6 +298,9 @@ watch(
                             <UiSelectItem v-for="item in branchesData" :value="item.merchantBranchId">
                               {{ item.branchName }}
                             </UiSelectItem>
+                          <UiSelectItem value="None">
+                            None
+                          </UiSelectItem>
                           </UiSelectGroup>
                           <UiSelectGroup v-else>
                             <UiSelectItem value="No branches found">

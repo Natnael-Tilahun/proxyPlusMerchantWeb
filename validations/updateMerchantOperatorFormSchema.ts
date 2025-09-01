@@ -8,7 +8,7 @@ export const updateMerchantOperatorFormSchema = toTypedSchema(
     firstName: z.string(),
     middleName: z.string(),
     lastName: z.string(),
-    branchId: z.string().optional().nullable(),
+    merchantBranchId: z.string().optional().nullable(),
     operatorRoleId: z.string(),
     active: z.boolean().optional().default(true),
     operatorCode: z.string().optional().nullable(),

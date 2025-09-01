@@ -21,11 +21,13 @@ export const mainLinks: MenuItem[] = [
         title: "My Branch Transactions",
         link: "/transactions/myBranch",
         permission: PermissionConstants.READ_MERCHANT_BRANCH_TRANSACTION,
+        requiresMyBranchId: true,
       },
       {
         title: "All Transactions",
         link: "/transactions",
         permission: PermissionConstants.READ_MERCHANT_TRANSACTION,
+        effectiveToAllBranch: true,
       },
     ],
   },
@@ -41,6 +43,7 @@ export const mainLinks: MenuItem[] = [
         title: "My Branch Operators",
         link: "/operators/myBranch",
         permission: PermissionConstants.READ_MERCHANT_OPERATOR,
+        requiresMyBranchId: true,
       },
       {
         title: "All Branch Operators",
@@ -62,6 +65,7 @@ export const mainLinks: MenuItem[] = [
         title: "My Branch",
         link: "/branches/mine",
         permission: PermissionConstants.READ_MERCHANT_BRANCH,
+        requiresMyBranchId: true,
       },
       {
         title: "All Branches",

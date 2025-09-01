@@ -101,17 +101,22 @@ const route = useRoute();
 
 const mainLinks = computed(() => {
   const isForAllBranch = authStore.role?.effectiveToAllBranch;
-
-  if (isForAllBranch) {
-    return allMainLinks;
-  }
+  const store = useAuthStore()
+  const myBranchId = store.profile?.merchantBranch?.merchantBranchId
 
   return allMainLinks.map((link) => {
     if (link.dropdown) {
       const newLink = { ...link };
-      newLink.dropdown = newLink.dropdown.filter(
-        (item) => !(item as any).effectiveToAllBranch
-      );
+      newLink.dropdown = newLink.dropdown.filter((item) => {
+        const itemAny = item as any;
+        if (itemAny.effectiveToAllBranch && !isForAllBranch) {
+          return false;
+        }
+        if (itemAny.requiresMyBranchId && !myBranchId) {
+          return false;
+        }
+        return true;
+      });
       return newLink;
     }
     return link;

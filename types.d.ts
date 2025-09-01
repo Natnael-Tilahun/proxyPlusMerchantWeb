@@ -242,5 +242,6 @@ export interface MenuItem {
     link: string;
     permission?: string;
     effectiveToAllBranch?: boolean
+    requiresMyBranchId?: boolean
   }[];
 }
