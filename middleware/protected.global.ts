@@ -4,7 +4,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const authStore = useAuthStore();
   const api = useApi();
 
-  const publicRoutes = ["/login", "/invalid-2fa", "/forgotPassword", "/activateNewUser"];
+  const publicRoutes = ["/login", "/invalid-2fa", "/forgotPassword", "/activateNewUser", "/merchantLogin"];
   if (publicRoutes.includes(to.path)) {
     return;
   }

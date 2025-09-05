@@ -10,8 +10,10 @@ import {
 import { profileFormSchema } from "~/validations/profileFormSchema";
 import { toast } from "~/components/ui/toast";
 import { format } from "date-fns";
+import type { Profile } from "~/types";
 
 const { getProfile, updateProfile } = useProfile();
+const authStore = useAuthStore();
 const isError = ref(false);
 const data = ref<Profile>();
 const isSubmitting = ref(false);
@@ -30,6 +32,7 @@ try {
   isLoading.value = true;
   data.value = await getProfile(); // Call your API function to fetch profile
   if (data.value) {
+    authStore.setProfile(data.value)
     form.setValues({
       ...data.value,
     });
@@ -90,9 +93,6 @@ try {
 
 <template>
   <div class="w-full flex flex-col gap-8">
-    <div class="pt-4">
-      <h1 class="md:text-2xl text-lg font-medium">Profile</h1>
-    </div>
 
     <!-- Loading Indicator -->
     <UiCard class="p-6 space-y-8" v-if="isLoading">
@@ -151,7 +151,7 @@ try {
               <FormMessage />
             </FormItem>
           </FormField>
-          <FormField v-slot="{ componentField }" name="operatorRole">
+          <FormField v-slot="{ componentField }" name="operatorRoleId">
             <FormItem>
               <FormLabel>Operator Role </FormLabel>
               <FormControl>
@@ -218,7 +218,7 @@ try {
           </FormField>
           <FormField
             v-slot="{ componentField }"
-            name="paymentReceivingAccountNumber"
+            name="merchant.defaultPaymentReceivingAccountNumber"
           >
             <FormItem>
               <FormLabel> Branch Payment Receiving Account Number </FormLabel>

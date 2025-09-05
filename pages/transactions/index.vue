@@ -5,15 +5,18 @@ import { useTransactions } from "~/composables/useTransactions";
 import { useRouter } from "vue-router"; // {{ edit_1 }}
 import type { Transaction } from "~/types";
 
-const { getTransactions } = useTransactions();
+const { getAllTransactions } = useTransactions();
 const data = ref<Transaction[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
 const router = useRouter(); // {{ edit_2 }}
 const transactionFilterStore = useTransactionFilterStore();
+definePageMeta({
+   hideBreadcrumb: true,
+});
 
 try {
-  const response = await getTransactions(" ",
+  const response = await getAllTransactions(" ",
     "0",
     "10000000",
     "DESC");
@@ -28,9 +31,9 @@ try {
 const refetch = async () => {
   try {
     isLoading.value = true;
-   const response = await getTransactions(" ",
-    "",
-    "",
+    const response = await getAllTransactions(" ",
+    "0",
+    "10000000",
     "DESC");
     data.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
   } catch (error) {
@@ -52,7 +55,7 @@ const navigateToPrintTransactions = () => {
   <div class="w-full flex flex-col gap-8">
     <div class="flex justify-between pt-4">
       <div>
-        <h1 class="md:text-2xl text-lg font-medium">Transactions</h1>
+        <h1 class="md:text-2xl text-lg font-medium">All Branch Transactions</h1>
         <p class="text-sm text-muted-foreground">
           View and manage transactions
         </p>

@@ -8,6 +8,7 @@ export const useApi = () => {
       "X-App-ID": __X_APP_ID__,
       "X-App-Version": __X_APP_VERSION__,
       "X-2FA-Token": store.twoFactorToken ? store.twoFactorToken : "",
+      "X-Current-Operator-Id": store.profile?.merchantOperatorId ? store.profile?.merchantOperatorId : ""
     };
 
     if (includeAuth && store.accessToken) {

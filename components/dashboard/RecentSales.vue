@@ -24,7 +24,7 @@ const isLoading = ref(false);
 const isError = ref(false);
 
 const navigateToTransactionDetail = (id: string) => {
-  router.push(`/transactions/transactionDetails/${id}`);
+  router.push(`/transactions/${id}`);
 };
 
 const getInitials = (name: string) =>
@@ -36,7 +36,7 @@ const getInitials = (name: string) =>
 </script>
 
 <template>
-  <div class="space-y-2 overflow-y-scroll max-h-[350px]">
+  <div class="space-y-3 overflow-y-scroll max-h-[350px]">
     <div class="grid gap-8" v-if="isLoading">
       <div
         class="h-16 flex justify-between items-center shadow-md rounded-xl p-4 "
@@ -101,11 +101,11 @@ const getInitials = (name: string) =>
     </div>
 
     <UiError v-if="isError" />
-    <div
+    <UiCard
       v-else
       v-for="item in data"
       :key="item.merchantTransactionId"
-      class="flex items-center cursor-pointer p-2 rounded-xl hover:rounded-2xl bg-accent dark:bg-gray-700 hover:bg-accent/20 hover:dark:bg-gray-600 hover:shadow-md hover:scale-[1.01] border border-transparent hover:border-accent/20 transition-all duration-300 ease-in-out"
+      class="flex items-center cursor-pointer p-2 rounded-xl hover:rounded-2xl shadow-md shadow-accent dark:bg-accent dark:hover:bg-accent/50 hover:bg-accent/40 hover:shadow-md hover:scale-[1.01] border-[0.5px] border-accent hover:border-accent/20 transition-all duration-300 ease-in-out"
       @click="navigateToTransactionDetail(item.merchantTransactionId)"
     >
       <Icons.deposit class="stroke-none" :fill="item.paymentStatus === 'COMPLETED' ? '#2DD683' : item.paymentStatus === 'PENDING' ? '#FFA500' : '#FF0000'" />
@@ -126,6 +126,6 @@ const getInitials = (name: string) =>
           {{ new Date(item.expirationDate).toLocaleString() }}
         </p>
       </div>
-    </div>
+    </UiCard>
   </div>
 </template>

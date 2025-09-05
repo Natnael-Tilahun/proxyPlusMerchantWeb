@@ -72,22 +72,22 @@ watch(receivedMessages, (newVal, oldVal) => {
               <div class="items-center flex gap-4">
                 <p class="text-lg font-medium">
                   {{
-                    showFullAccountId ? typeof paymentResponse?.merchantAccountNumber === "string"
+                    paymentResponse?.merchantAccountNumber && (showFullAccountId ? typeof paymentResponse?.merchantAccountNumber === "string"
                         ? paymentResponse.merchantAccountNumber
                         : "-": formatAccountNumber(
                       typeof paymentResponse?.merchantAccountNumber === "string"
                         ? paymentResponse.merchantAccountNumber
                         : "-"
-                    )
+                    ))
                   }}
                 </p>
                 <Icons.hide
-                  v-if="showFullAccountId"
+                  v-if="showFullAccountId && paymentResponse?.merchantAccountNumber"
                   class="md:min-w-6 md:min-h-6 min-w-5 min-h-5 fill-white"
                   @click="toggleAccountIdVisibility"
                 />
                 <Icons.view
-                  v-else
+                v-if="!showFullAccountId && paymentResponse?.merchantAccountNumber"
                   class="md:min-w-6 md:min-h-6 min-w-5 min-h-5 fill-white"
                   @click="toggleAccountIdVisibility"
                 />
@@ -123,7 +123,7 @@ watch(receivedMessages, (newVal, oldVal) => {
             >
               <img
                 ref="qrImgRef"
-                :src="`https://api.qrserver.com/v1/create-qr-code/?data=${paymentResponse.qrEncodedData}`"
+                :src="`https://api.qrserver.com/v1/create-qr-code/?data=${paymentResponse?.qrEncodedData}`"
                 alt="QR Code"
               />
             </UiCard>
@@ -131,7 +131,7 @@ watch(receivedMessages, (newVal, oldVal) => {
               class="flex w-full flex-col items-center gap-2 justify-center col-span-full"
             >
               <Icon
-                v-if="paymentResponse.paymentStatus == 'PENDING'"
+                v-if="paymentResponse?.paymentStatus == 'PENDING'"
                 name="svg-spinners:8-dots-rotate"
                 class="h-6 w-6 animate-spin text-yellow-500"
               ></Icon>
@@ -140,20 +140,20 @@ watch(receivedMessages, (newVal, oldVal) => {
                   'inline-flex items-center px-3 py-1 rounded-full text-xs font-medium flex flex-col items-center gap-2',
                   {
                     'bg-green-600 text-white font-bold w-fit':
-                      String(paymentResponse.paymentStatus).toLowerCase() ===
+                      String(paymentResponse?.paymentStatus).toLowerCase() ===
                       'completed',
                     'bg-yellow-500 text-black font-bold w-fit':
-                      String(paymentResponse.paymentStatus).toLowerCase() ===
+                      String(paymentResponse?.paymentStatus).toLowerCase() ===
                       'pending',
                     'bg-red-600 text-white font-bold w-fit':
-                      String(paymentResponse.paymentStatus).toLowerCase() ===
+                      String(paymentResponse?.paymentStatus).toLowerCase() ===
                         'failed' ||
-                      String(paymentResponse.paymentStatus).toLowerCase() ===
+                      String(paymentResponse?.paymentStatus).toLowerCase() ===
                         'expired',
                   },
                 ]"
               >
-                <p>{{ paymentResponse.paymentStatus }}</p>
+                <p>{{ paymentResponse?.paymentStatus }}</p>
               </div>
             </div>
           </UiCardDescription>
@@ -173,7 +173,7 @@ watch(receivedMessages, (newVal, oldVal) => {
       </UiCardContent>
     </UiCard>
     <DashboardInitiatePaymentPushUssd
-      v-if="String(paymentResponse.paymentStatus).toLowerCase() === 'pending'"
+      v-if="String(paymentResponse?.paymentStatus).toLowerCase() === 'pending'"
       class="w-full min-h-max"
       :merchantTransactionId="paymentResponse?.merchantTransactionId"
     />

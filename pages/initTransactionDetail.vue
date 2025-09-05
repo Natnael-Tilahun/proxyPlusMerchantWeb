@@ -19,7 +19,7 @@ const setOpenConfirmationModal = (value: boolean) => {
 
 const closeConfirmationModal = () => {
   openConfirmationModal.value = false;
-  navigateTo("/transactions");
+  navigateTo("/");
 };
 
 const formatDate = (date: string) => {
