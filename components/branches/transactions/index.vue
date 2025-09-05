@@ -13,9 +13,7 @@ const isError = ref(false);
 const router = useRouter(); // {{ edit_2 }}
 const transactionFilterStore = useTransactionFilterStore();
 const branchId = ref<string>("");
-
 branchId.value = getIdFromPath();
-console.log("branchid",branchId.value);
 
 
 try {
@@ -44,7 +42,10 @@ const refetch = async () => {
 
 const navigateToPrintTransactions = () => {
   router.push({
-    path: "/transactions/print-transactions",
+    path: `/branches/${branchId.value}`,
+    query : {
+      activeTab: "downloadTransactions"
+    }
   });
 };
 </script>

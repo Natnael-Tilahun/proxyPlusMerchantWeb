@@ -55,7 +55,7 @@ const formatDate = (date: string) => {
 
 const closeConfirmationModal = () => {
   setOpenConfirmationModal(false)
-  navigateTo("/transactions");
+  navigateTo("/");
 };
 
 </script>
@@ -106,7 +106,7 @@ const closeConfirmationModal = () => {
         <TransactionsTransactionDetailItem label="MbTransaction Id" :value="transactionData?.mbTransactionId" />
         <TransactionsTransactionDetailItem label="Core Transaction Id" :value="transactionData?.coreTransactionId" />
         <TransactionsTransactionDetailItem label="Merchant Account Number"
-          :value="transactionData?.merchantAccountNumber" />
+          :value="transactionData?.merchantAccountNumber  && formatAccountNumber(typeof transactionData.merchantAccountNumber === 'string' ? transactionData.merchantAccountNumber: '-')" />
         <TransactionsTransactionDetailItem label="Payer AccountNumber" :value="transactionData?.payerAccountNumber?.length && formatAccountNumber(typeof transactionData.payerAccountNumber === 'string' ? transactionData.payerAccountNumber: '-')" />
         <TransactionsTransactionDetailItem label="Payer Id" :value="transactionData?.payerId" />
         <TransactionsTransactionDetailItem label="Payer Name" :value="transactionData?.payerName" />

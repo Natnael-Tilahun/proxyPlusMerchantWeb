@@ -63,9 +63,9 @@ export const useTransactions = () => {
           {
             method: "GET",
             params:{
-              ...(paymentStatus || transactionFilterStore.paymentStatus ? {
-                  "paymentStatus.equals": paymentStatus ?? transactionFilterStore.paymentStatus == 'NONE' ? '' : transactionFilterStore.paymentStatus
-                } : {}),
+              ...((paymentStatus === ' ' ? undefined : paymentStatus) || transactionFilterStore.paymentStatus ? {
+                "paymentStatus.equals": (paymentStatus === ' ' ? undefined : paymentStatus) ?? (transactionFilterStore.paymentStatus === 'NONE' ? '' : transactionFilterStore.paymentStatus)
+              } : {}),
               // "paymentStatus.equals": paymentStatus ?? transactionFilterStore.paymentStatus == 'NONE' ? '' : transactionFilterStore.paymentStatus,
               "page": pageNumber ?? transactionFilterStore.pageNumber,
               "size": pageSize ?? transactionFilterStore.pageSize,
@@ -186,14 +186,16 @@ export const useTransactions = () => {
       completedDate= undefined, 
   ) => {
 
+    console.log("fhjahfajsdhj", transactionFilterStore.paymentStatus, "paymentStatus: ", paymentStatus)
+
     try {
       const { data, pending, error, status } = await fetch<Transaction[]>(
         `/api/v1/merchants2/transactions`,
         {
           method: "GET",
           params:{
-            ...(paymentStatus || transactionFilterStore.paymentStatus ? {
-                "paymentStatus.equals": paymentStatus ?? transactionFilterStore.paymentStatus == 'NONE' ? '' : transactionFilterStore.paymentStatus
+            ...((paymentStatus === ' ' ? undefined : paymentStatus) || transactionFilterStore.paymentStatus ? {
+                "paymentStatus.equals": (paymentStatus === ' ' ? undefined : paymentStatus) ?? (transactionFilterStore.paymentStatus === 'NONE' ? '' : transactionFilterStore.paymentStatus)
               } : {}),
             // "paymentStatus.equals": paymentStatus ?? transactionFilterStore.paymentStatus == 'NONE' ? '' : transactionFilterStore.paymentStatus,
             "page": pageNumber ?? transactionFilterStore.pageNumber,
@@ -360,9 +362,9 @@ export const useTransactions = () => {
           {
             method: "GET",
             params:{
-              ...(paymentStatus || transactionFilterStore.paymentStatus ? {
-                  "paymentStatus.equals": paymentStatus ?? transactionFilterStore.paymentStatus == 'NONE' ? '' : transactionFilterStore.paymentStatus
-                } : {}),
+              ...((paymentStatus === ' ' ? undefined : paymentStatus) || transactionFilterStore.paymentStatus ? {
+                "paymentStatus.equals": (paymentStatus === ' ' ? undefined : paymentStatus) ?? (transactionFilterStore.paymentStatus === 'NONE' ? '' : transactionFilterStore.paymentStatus)
+              } : {}),
               // "paymentStatus.equals": paymentStatus ?? transactionFilterStore.paymentStatus == 'NONE' ? '' : transactionFilterStore.paymentStatus,
               "page": pageNumber ?? transactionFilterStore.pageNumber,
               "size": pageSize ?? transactionFilterStore.pageSize,
@@ -506,9 +508,9 @@ export const useTransactions = () => {
           {
             method: "GET",
             params:{
-              ...(paymentStatus || transactionFilterStore.paymentStatus ? {
-                  "paymentStatus.equals": paymentStatus ?? transactionFilterStore.paymentStatus == 'NONE' ? '' : transactionFilterStore.paymentStatus
-                } : {}),
+              ...((paymentStatus === ' ' ? undefined : paymentStatus) || transactionFilterStore.paymentStatus ? {
+                "paymentStatus.equals": (paymentStatus === ' ' ? undefined : paymentStatus) ?? (transactionFilterStore.paymentStatus === 'NONE' ? '' : transactionFilterStore.paymentStatus)
+              } : {}),
               // "paymentStatus.equals": paymentStatus ?? transactionFilterStore.paymentStatus == 'NONE' ? '' : transactionFilterStore.paymentStatus,
               "page": pageNumber ?? transactionFilterStore.pageNumber,
               "size": pageSize ?? transactionFilterStore.pageSize,

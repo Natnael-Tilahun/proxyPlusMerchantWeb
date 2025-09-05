@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import { jsPDF } from "jspdf";
 import { useTransactions } from "~/composables/useTransactions";
 import { format } from "date-fns";
-import { cn } from "~/lib/utils";
+import { cn, getIdFromPath } from "~/lib/utils";
 import { Calendar as CalendarIcon } from "lucide-vue-next";
 import { Icons } from "~/components/icons";
 import type { Transaction } from "~/types";
@@ -11,10 +11,12 @@ import type { Transaction } from "~/types";
 const transactionData = ref<Transaction[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
-const { getAllTransactions } = useTransactions();
+const { getTransactionsByBranchId } = useTransactions();
 const startDate = ref<Date>();
 const endDate = ref<Date>();
 const selectedAccount = ref<string>();
+const branchId = ref<string>("");
+branchId.value = getIdFromPath();
 
 // Fetch transaction data based on the account ID or other parameters
 async function fetchTransactionData() {
@@ -23,10 +25,7 @@ async function fetchTransactionData() {
   yesterday.setDate(yesterday.getDate() - 1);
   yesterday.setHours(0, 0, 0, 0);
     isLoading.value = true;
-    const response = await getAllTransactions(" ",
-    "0",
-    "10000000",
-    "DESC");
+    const response = await getTransactionsByBranchId(branchId.value);
     transactionData.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime());
     selectedAccount.value = transactionData.value[0]?.merchantAccountNumber;
   } catch (error) {
@@ -148,7 +147,7 @@ function downloadStatement() {
         <img src="/cbe-logo.png" class="md:w-fit h-fit" alt="Logo" />
         <div class="md:space-y-2 space-y-0 flex flex-col lg:items-center">
           <h1 class="lg:text-xl md:text-lg text-sm">
-            Merchant <span> </span> Transaction <span> </span> Statement
+            Branch <span> </span> Transaction <span> </span> Statement
           </h1>
           <div
             class="flex items-center text-primary text-xs md:text-sm lg:text-base gap-4 tracking-wider"

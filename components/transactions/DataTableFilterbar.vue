@@ -2,7 +2,6 @@
 import { type Table } from "@tanstack/vue-table";
 import { CalendarIcon } from "lucide-vue-next";
 import DataTableViewOptions from "~/components/ui/dataTable/ViewOptions.vue";
-
 // import { type Task } from "../data/schema";
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -125,7 +124,7 @@ onMounted(async () => {
             placeholder="Filter by payer account number"
             v-model="transactionFilterStore.payerAccountNumber"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -135,7 +134,7 @@ onMounted(async () => {
             placeholder="Filter by payer phone number"
             v-model="transactionFilterStore.payerPhone"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -145,7 +144,7 @@ onMounted(async () => {
             placeholder="Filter by payer id"
             v-model="transactionFilterStore.payerId"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -157,7 +156,7 @@ onMounted(async () => {
             placeholder="Filter by amount greater than or equal"
             v-model="transactionFilterStore.amountGreaterThanOrEqual"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -169,7 +168,7 @@ onMounted(async () => {
             placeholder="Filter by amount less than or equal"
             v-model="transactionFilterStore.amountLessThanOrEqual"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -181,7 +180,7 @@ onMounted(async () => {
             placeholder="Filter by payment reference"
             v-model="transactionFilterStore.paymentReference"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -191,7 +190,7 @@ onMounted(async () => {
             placeholder="Filter by dynamic id"
             v-model="transactionFilterStore.dynamicId"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -203,7 +202,7 @@ onMounted(async () => {
             placeholder="Filter by mobile banking transaction id"
             v-model="transactionFilterStore.mbTransactionId"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -215,7 +214,7 @@ onMounted(async () => {
             placeholder="Filter by core transaction id"
             v-model="transactionFilterStore.coreTransactionId"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -227,7 +226,7 @@ onMounted(async () => {
             placeholder="Filter by merchant account number"
             v-model="transactionFilterStore.merchantAccountNumber"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 

@@ -255,7 +255,7 @@ watch(
         </UiCardContent>
         <div class="bg-primary w-full mt-auto rounded-b-3xl p-6">
           <p class="text-lg text-primary-foreground">
-            Total Sales: {{ transactionsNumber }}
+            Total Sales Count: {{ transactionsNumber }}
           </p>
         </div>
       </UiCard>

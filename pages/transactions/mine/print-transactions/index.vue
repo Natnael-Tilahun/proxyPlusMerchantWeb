@@ -11,7 +11,7 @@ import type { Transaction } from "~/types";
 const transactionData = ref<Transaction[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
-const { getAllTransactions } = useTransactions();
+const { getMyTransactions } = useTransactions();
 const startDate = ref<Date>();
 const endDate = ref<Date>();
 const selectedAccount = ref<string>();
@@ -23,9 +23,9 @@ async function fetchTransactionData() {
   yesterday.setDate(yesterday.getDate() - 1);
   yesterday.setHours(0, 0, 0, 0);
     isLoading.value = true;
-    const response = await getAllTransactions(" ",
+    const response = await getMyTransactions(" ",
     "0",
-    "10000000",
+    "1000000000",
     "DESC");
     transactionData.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime());
     selectedAccount.value = transactionData.value[0]?.merchantAccountNumber;
@@ -148,7 +148,7 @@ function downloadStatement() {
         <img src="/cbe-logo.png" class="md:w-fit h-fit" alt="Logo" />
         <div class="md:space-y-2 space-y-0 flex flex-col lg:items-center">
           <h1 class="lg:text-xl md:text-lg text-sm">
-            Merchant <span> </span> Transaction <span> </span> Statement
+            My <span> </span> Transaction <span> </span> Statement
           </h1>
           <div
             class="flex items-center text-primary text-xs md:text-sm lg:text-base gap-4 tracking-wider"

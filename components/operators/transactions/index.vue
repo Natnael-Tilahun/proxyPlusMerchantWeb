@@ -13,10 +13,8 @@ const isError = ref(false);
 const router = useRouter(); // {{ edit_2 }}
 const transactionFilterStore = useTransactionFilterStore();
 const operatorId = ref<string>("");
-
 operatorId.value = getIdFromPath();
-console.log("operatorid",operatorId.value);
-
+const route = useRoute();
 
 try {
   const response = await getTransactionsByOperatorId(operatorId.value);
@@ -43,7 +41,10 @@ const refetch = async () => {
 
 const navigateToPrintTransactions = () => {
   router.push({
-    path: "/transactions/print-transactions",
+    path: `/operators/${operatorId.value}`,
+    query : {
+      activeTab: "downloadTransactions"
+    }
   });
 };
 </script>

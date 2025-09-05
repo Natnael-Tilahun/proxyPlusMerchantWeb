@@ -60,7 +60,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                 <UiInput
                   type="text"
                   class="h-10"
-                  placeholder="100012345678"
+                  placeholder="Enter phone number"
                   v-bind="componentField"
                   :disabled="isLoading"
                 />

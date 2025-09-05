@@ -32,9 +32,9 @@ try {
 const refetch = async () => {
   try {
     isLoading.value = true;
-   const response = await getMyTransactions(" ",
-    "",
-    "",
+    const response = await getMyTransactions(" ",
+    "0",
+    "1000000000",
     "DESC");
     data.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
   } catch (error) {
@@ -47,7 +47,7 @@ const refetch = async () => {
 
 const navigateToPrintTransactions = () => {
   router.push({
-    path: "/transactions/print-transactions",
+    path: "/transactions/mine/print-transactions",
   });
 };
 </script>

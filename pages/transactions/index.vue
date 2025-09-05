@@ -31,9 +31,9 @@ try {
 const refetch = async () => {
   try {
     isLoading.value = true;
-   const response = await getAllTransactions(" ",
-    "",
-    "",
+    const response = await getAllTransactions(" ",
+    "0",
+    "10000000",
     "DESC");
     data.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
   } catch (error) {

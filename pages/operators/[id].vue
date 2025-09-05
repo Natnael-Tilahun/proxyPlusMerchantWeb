@@ -195,6 +195,19 @@ watch(
             class="text-lg data-[state=active]:bg-primary  data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border  rounded-t-lg rounded-b-none data-[state=inactive]:hidden">
             Transactions Details
           </UiTabsTrigger>
+          <UiTabsTrigger value="downloadTransactions" @click="
+            navigateTo({
+              path: route.path,
+              query: {
+                activeTab: 'downloadTransactions',
+              },
+            })
+            "
+            :disabled="openItems != 'downloadTransactions'"
+            class="text-lg data-[state=active]:bg-primary  data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border  rounded-t-lg rounded-b-none data-[state=inactive]:hidden"
+            >
+            Download Transactions
+          </UiTabsTrigger>
         </UiPermissionGuard>
       </UiTabsList>
       <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR">
@@ -342,6 +355,9 @@ watch(
         </UiTabsContent>
         <UiTabsContent value="transactionDetails" class="text-base bg-background border p-6 h-full rounded-lg">
           <OperatorsTransactionsDetails />
+        </UiTabsContent>
+        <UiTabsContent value="downloadTransactions" class="text-base bg-background border p-6 h-full rounded-lg">
+          <OperatorsTransactionsDownloadTransactions />
         </UiTabsContent>
       </UiPermissionGuard>
     </UiTabs>
