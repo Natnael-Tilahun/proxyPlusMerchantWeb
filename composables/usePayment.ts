@@ -1,4 +1,3 @@
-import { Toast, ToastAction, useToast } from "~/components/ui/toast";
 import type { Transaction, UserInput } from "~/types";
 import { handleApiError, type ApiResult } from "~/types/api";
 
@@ -6,7 +5,6 @@ export const usePayment = () => {
   const runtimeConfig = useRuntimeConfig();
   const isLoading = ref<boolean>(false);
   const store = useAuthStore();
-  const { toast } = useToast();
   const { fetch } = useApi();
 
   type UserInputForPushUssd = {

@@ -2,8 +2,9 @@
 import { Skeleton } from "~/components/ui/skeleton";
 import { Icons } from "~/components/icons";
 import type { Transaction } from "~/types";
+import { PermissionConstants } from "~/constants/permissions";
 
-const { getTransactions } = useTransactions();
+const { getAllTransactions, getMyTransactions } = useTransactions();
 const isLoading = ref(true);
 const transactionData = ref<Transaction[]>([]);
 const todaysTransactions = ref<Transaction[]>([]);
@@ -11,6 +12,7 @@ const showFullAvailableBalance = ref(false);
 const showFullCurrentBalance = ref(false);
 const currentPaymentSummaryOption = ref("Daily");
 const transactionsNumber = ref();
+
 
 const paymentSummaryOptions = computed(() => [
   "Daily",
@@ -99,14 +101,19 @@ try {
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
   yesterday.setHours(0, 0, 0, 0);
-  transactionData.value = await getTransactions(
-    " ",
+  // transactionData.value = await getAllTransactions(
+  //   " ",
+  //   "0",
+  //   "100000000000",
+  //   "DESC",
+  //   // `${yesterday.toISOString()}`
+  // ) || [];
+   const response = await getMyTransactions(" ",
     "0",
-    "10000000",
-    "DESC",
-    // `${yesterday.toISOString()}`
-  ) || [];
-  todaysTransactions.value = transactionData.value.filter((transaction) => {
+    "1000000000",
+    "DESC");
+    transactionData.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
+    todaysTransactions.value = transactionData.value.filter((transaction) => {
     const transactionDate = new Date(transaction.expirationDate); // Assuming 'date' is the field for transaction date
     const today = new Date();
     return (
@@ -132,7 +139,7 @@ watch(
 </script>
 
 <template>
-  <div class="md:space-y-8 space-y-6 dark:bg-gray-900">
+  <div class="md:space-y-8 space-y-6 ">
     <!-- Loading Indicator Skeleton -->
     <div
       class="grid gap-4 lg:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
@@ -161,7 +168,7 @@ watch(
     >
       <!-- Account list and total balance -->
       <UiCard
-        class="col-span-1 lg:col-span-4 xl:col-span-5 max-h-min shadow-md rounded-3xl dark:bg-gray-800 flex flex-col justify-between relative"
+        class="col-span-1 lg:col-span-4 xl:col-span-5 max-h-min shadow-md rounded-3xl flex flex-col justify-between relative"
       >
         <img
           src="/backgroundMap.png"
@@ -248,12 +255,13 @@ watch(
         </UiCardContent>
         <div class="bg-primary w-full mt-auto rounded-b-3xl p-6">
           <p class="text-lg text-primary-foreground">
-            Total Sales: {{ transactionsNumber }}
+            Total Sales Count: {{ transactionsNumber }}
           </p>
         </div>
       </UiCard>
 
       <!-- Initiate payment -->
+    <UiPermissionGuard :permission="PermissionConstants.INIT_MERCHANT_TRANSACTION">
       <UiCard
         class="col-span-1 lg:col-span-3  max-h-min xl:col-span-4 p-6 space-y-4 w-full"
       >
@@ -262,14 +270,16 @@ watch(
         </h1>
         <DashboardInitiatePaymentQRCode />
       </UiCard>
+      </UiPermissionGuard>
     </div>
 
     <div
       class="grid gap-4 md:gap-8 max-h-[400px] grid-cols-1 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-9"
     >
       <!-- Account Overview -->
+      <!-- <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION"> -->
       <UiCard
-        class="col-span-1 lg:col-span-4 max-h-[450px] xl:col-span-5 shadow-md rounded-xl dark:bg-gray-800"
+        class="col-span-1 lg:col-span-4 max-h-[450px] xl:col-span-5 shadow-md rounded-xl"
       >
         <UiCardHeader>
           <UiCardTitle>Overview</UiCardTitle>
@@ -278,10 +288,12 @@ watch(
           <DashboardOverview :transactionData="transactionData" />
         </UiCardContent>
       </UiCard>
+      <!-- </UiPermissionGuard> -->
 
+    <!-- <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION"> -->
       <!-- Recent Transactions -->
       <UiCard
-        class="col-span-1 lg:col-span-3 max-h-[450px] xl:col-span-4 shadow-md rounded-xl dark:bg-gray-800"
+        class="col-span-1 lg:col-span-3 max-h-[450px] xl:col-span-4 shadow-md rounded-xl"
       >
         <UiCardHeader>
           <div class="flex justify-between w-full items-center">
@@ -300,6 +312,7 @@ watch(
           <DashboardRecentSales :transactionData="transactionData" />
         </UiCardContent>
       </UiCard>
+      <!-- </UiPermissionGuard> -->
     </div>
   </div>
 </template>

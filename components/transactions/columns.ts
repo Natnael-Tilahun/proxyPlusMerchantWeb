@@ -37,7 +37,7 @@ export const columns: ColumnDef<Transaction>[] = [
         {
           class:
             "font-medium text-primary w-fit whitespace-nowrap truncate hover:w-full",
-          to: `transactions/transactionDetails/${merchantTransactionId}`
+          to: `/transactions/${merchantTransactionId}`
         },
         payerName || "View"
       ) 

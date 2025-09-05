@@ -13,7 +13,7 @@ const props = defineProps({
 
 <template>
   <div
-    class="{`w-full h-60 md:h-[500px] p-10 bg-[#f8dff3] shadow-none border-none dark:bg-thm_dark_background rounded-xl border-[1px] max-h-screen flex flex-col gap-2 justify-center items-center ${className}`}"
+    class="{`w-full h-60 md:h-[500px] p-10 bg-[#f8dff3] shadow-none border-none dark:bg-[#4b1217] rounded-xl border-[1px] max-h-screen flex flex-col gap-2 justify-center items-center ${className}`}"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

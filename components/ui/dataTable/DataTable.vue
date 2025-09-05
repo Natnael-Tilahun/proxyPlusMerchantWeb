@@ -80,7 +80,7 @@ const table = useVueTable({
             </UiTableHead>
           </UiTableRow>
         </UiTableHeader>
-        <UiTableBody class="text-secondary-foreground">
+        <UiTableBody class="text-secondary-foregroun">
           <template v-if="table.getRowModel().rows?.length">
             <UiTableRow
               v-for="row in table.getRowModel().rows"

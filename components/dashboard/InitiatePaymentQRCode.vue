@@ -32,7 +32,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
       query: {
         merchantTransactionId: data.merchantTransactionId,
         merchantAccountNumber: data.merchantAccountNumber,
-        paymentReference: data.paymentReference,
+        paymentReference: data.paymentReference || "Merchant trxn",
         amount: data.amount,
         qrEncodedData: data.qrEncodedData,
         dynamicId: data.dynamicId,
@@ -74,12 +74,12 @@ const onSubmit = form.handleSubmit(async (values: any) => {
       </FormField>
       <FormField v-slot="{ componentField }" name="paymentReference">
         <FormItem>
-          <FormLabel> Payment Reference</FormLabel>
+          <FormLabel> Remark</FormLabel>
           <FormControl>
             <UiInput
               type="text"
               class="h-10 placeholder:text-muted-foreground"
-              placeholder="Enter Payment Reference"
+              placeholder="Enter Remark"
               v-bind="componentField"
               :disabled="isLoading"
             />
@@ -98,7 +98,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
           class="h-4 w-4 animate-spin"
         ></Icon>
 
-        Generate QR Code
+        Intiate payment
       </UiButton>
     </div>
   </form>

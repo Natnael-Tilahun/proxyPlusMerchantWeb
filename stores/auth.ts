@@ -13,6 +13,7 @@ interface AuthState {
   twoFactorToken:string
   permissions: string[];
   profile: Partial<Profile> | null;
+  role: {};
 }
 
 // interface Profile {
@@ -52,7 +53,8 @@ export const useAuthStore = defineStore("auth", {
     verificationId: "",
     expiryTime: "",
     phone:"",
-    twoFactorToken:""
+    twoFactorToken:"",
+    role: {},
   }),
 
   actions: {
@@ -95,12 +97,12 @@ export const useAuthStore = defineStore("auth", {
   },
   getters: {
     hasPermissions: (state) => {
-      return (permission: string) => state.permissions.includes(permission);
+      return (permission: string) => state?.permissions.includes(permission);
     },
 
-    hasRole: (state) => {
-      return (role: string) => state.profile?.operatorRole === role;
-    }
+    // hasRole: (state) => {
+    //   return (role: string) => state.roles.includes(role);
+    // }
   },
   persist: {
     // storage: persistedState.cookies,

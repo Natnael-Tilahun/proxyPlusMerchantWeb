@@ -37,7 +37,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
         description: data,
         variant: "default",
       });
-      navigateTo(`/transactions/transactionDetails/${props.merchantTransactionId}`, { replace: true });
+      navigateTo(`/transactions/mine/${props.merchantTransactionId}`, { replace: true });
     }
   } catch (error) {
     console.error("Login error: ", error);
@@ -60,7 +60,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                 <UiInput
                   type="text"
                   class="h-10"
-                  placeholder="100012345678"
+                  placeholder="Enter phone number"
                   v-bind="componentField"
                   :disabled="isLoading"
                 />
