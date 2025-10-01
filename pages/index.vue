@@ -7,6 +7,7 @@ import { PermissionConstants } from "~/constants/permissions";
 const { getAllTransactions, getMyTransactions } = useTransactions();
 const isLoading = ref(true);
 const transactionData = ref<Transaction[]>([]);
+const allTransactions = ref<Transaction[]>([]);
 const todaysTransactions = ref<Transaction[]>([]);
 const showFullAvailableBalance = ref(false);
 const showFullCurrentBalance = ref(false);
@@ -112,7 +113,16 @@ try {
     "0",
     "1000000000",
     "DESC");
-    transactionData.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
+    allTransactions.value = (response || [])
+      .slice()
+      .sort(
+        (a, b) =>
+          new Date(b.expirationDate).getTime() -
+          new Date(a.expirationDate).getTime()
+      );
+    transactionData.value = allTransactions.value.filter(
+      (transaction) => transaction.paymentStatus === "COMPLETED"
+    );
     todaysTransactions.value = transactionData.value.filter((transaction) => {
     const transactionDate = new Date(transaction.expirationDate); // Assuming 'date' is the field for transaction date
     const today = new Date();
@@ -309,7 +319,7 @@ watch(
           </div>
         </UiCardHeader>
         <UiCardContent>
-          <DashboardRecentSales :transactionData="transactionData" />
+          <DashboardRecentSales :transactionData="allTransactions" />
         </UiCardContent>
       </UiCard>
       <!-- </UiPermissionGuard> -->
