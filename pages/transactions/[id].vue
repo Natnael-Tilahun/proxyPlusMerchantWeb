@@ -5,7 +5,7 @@ import { formatAccountNumber } from "~/lib/formatAccountNumber";
 import type { Transaction } from "~/types";
 
 const route = useRoute();
-const { getTransactionById } = useTransactions();
+const { getTransactionById, getMyTransactionById } = useTransactions();
 const isLoading = ref(false);
 const transactionData = ref<Transaction | null>(null);
 const transactionId = ref<string | null>(null);
@@ -22,7 +22,7 @@ const setOpenConfirmationModal = (value: boolean) => {
 try {
   isLoading.value = true;
   const id = route.params.id as string;
-  transactionData.value = await getTransactionById(id);
+  transactionData.value = await getMyTransactionById(id);
   transactionId.value = transactionData.value?.merchantTransactionId;
   if (transactionData.value?.paymentStatus == "PENDING" && transactionData.value?.merchantTransactionId) {
     connect(transactionId.value || "");

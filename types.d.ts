@@ -50,6 +50,17 @@ interface UserInput {
   password: string;
 }
 
+interface UserInputForPushUssd {
+  merchantTransactionId: string;
+  customerPhone: string;
+}
+
+interface UserInputForOtp {
+  merchantTransactionId: string;
+  customerPhone?: string;
+  customerOtp?: string
+}
+
 interface UserWithoutPassword {
   email: string;
   id: string;
@@ -179,11 +190,11 @@ export interface VerificationRequest {
 
 
 interface AuthResponse {
-  operatorDTO : {},
-  tokenDTO : {
-  accessToken?: string;
-  refreshToken?: string;
-  permissions?: string[];
+  operatorDTO: {},
+  tokenDTO: {
+    accessToken?: string;
+    refreshToken?: string;
+    permissions?: string[];
   }
 }
 

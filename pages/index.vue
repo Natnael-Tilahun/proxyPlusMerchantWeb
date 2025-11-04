@@ -109,21 +109,21 @@ try {
   //   "DESC",
   //   // `${yesterday.toISOString()}`
   // ) || [];
-   const response = await getMyTransactions(" ",
+  const response = await getMyTransactions(" ",
     "0",
     "1000000000",
     "DESC");
-    allTransactions.value = (response || [])
-      .slice()
-      .sort(
-        (a, b) =>
-          new Date(b.expirationDate).getTime() -
-          new Date(a.expirationDate).getTime()
-      );
-    transactionData.value = allTransactions.value.filter(
-      (transaction) => transaction.paymentStatus === "COMPLETED"
+  allTransactions.value = (response || [])
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.expirationDate).getTime() -
+        new Date(a.expirationDate).getTime()
     );
-    todaysTransactions.value = transactionData.value.filter((transaction) => {
+  transactionData.value = allTransactions.value.filter(
+    (transaction) => transaction.paymentStatus === "COMPLETED"
+  );
+  todaysTransactions.value = transactionData.value.filter((transaction) => {
     const transactionDate = new Date(transaction.expirationDate); // Assuming 'date' is the field for transaction date
     const today = new Date();
     return (
@@ -151,10 +151,7 @@ watch(
 <template>
   <div class="md:space-y-8 space-y-6 ">
     <!-- Loading Indicator Skeleton -->
-    <div
-      class="grid gap-4 lg:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-      v-if="isLoading"
-    >
+    <div class="grid gap-4 lg:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" v-if="isLoading">
       <div class="h-32 flex flex-col gap-4 shadow-md rounded-3xl p-8">
         <UiSkeleton class="h-32 w-20 bg-slate-300" />
         <UiSkeleton class="h-32 w-10 bg-slate-300" />
@@ -172,91 +169,63 @@ watch(
       </div>
     </div>
 
-    <div
-      v-else
-      class="grid gap-4 md:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-9"
-    >
+    <div v-else class="grid gap-4 md:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-9">
       <!-- Account list and total balance -->
       <UiCard
-        class="col-span-1 lg:col-span-4 xl:col-span-5 max-h-min shadow-md rounded-3xl flex flex-col justify-between relative"
-      >
-        <img
-          src="/backgroundMap.png"
-          alt="background"
-          class="opacity-90 dark:opacity-50 absolute top-0 left-0 w-full h-full z-0"
-        />
-        <UiCardHeader
-          class="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10"
-        >
-          <UiCardTitle class="font-semibold text-primary text-xl"
-            >My {{ currentPaymentSummaryOption }} Sales</UiCardTitle
-          >
+        class="col-span-1 lg:col-span-4 xl:col-span-5 max-h-[300px] shadow-md rounded-3xl flex flex-col justify-between relative">
+        <img src="/backgroundMap.png" alt="background"
+          class="opacity-90 dark:opacity-50 absolute top-0 left-0 w-full h-full z-0" />
+        <UiCardHeader class="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
+          <UiCardTitle class="font-semibold text-primary text-xl">My {{ currentPaymentSummaryOption }} Sales
+          </UiCardTitle>
 
           <UiSelect name="paymentStatus" v-model="currentPaymentSummaryOption">
-            <UiSelectTrigger
-              class="h-8 w-[100px] z-10 border border-muted-foreground/30"
-            >
+            <UiSelectTrigger class="h-8 w-[100px] z-10 border border-muted-foreground/30">
               <UiSelectValue :placeholder="`${currentPaymentSummaryOption}`" />
             </UiSelectTrigger>
             <UiSelectContent side="bottom">
-              <UiSelectItem
-                v-for="option in paymentSummaryOptions"
-                :key="option"
-                :value="option"
-              >
+              <UiSelectItem v-for="option in paymentSummaryOptions" :key="option" :value="option">
                 {{ option }}
               </UiSelectItem>
             </UiSelectContent>
           </UiSelect>
         </UiCardHeader>
-        <UiCardContent
-          class="h-full flex justify-center flex-col gap-1 relative z-10"
-        >
+        <UiCardContent class="h-full flex justify-center flex-col gap-1 relative z-10">
           <div class="flex items-center gap-6">
             <p class="text-2xl font-bold">
               {{
                 isLoading
                   ? "Loading..."
-                  : `${
-                      totalTransactionAmount
-                        ? formatAvailableBalance(
-                            totalTransactionAmount.toFixed(2),
-                            showFullAvailableBalance,
-                            "balance"
-                          )
-                        : "----"
-                    } `
+                  : `${totalTransactionAmount
+                    ? formatAvailableBalance(
+                      totalTransactionAmount.toFixed(2),
+                      showFullAvailableBalance,
+                      "balance"
+                    )
+                    : "----"
+                  } `
               }}
               {{ todaysTransactions?.[0]?.currencyCode }}
             </p>
-            <Icons.hide
-              v-if="showFullAvailableBalance"
-              class="md:w-7 md:h-7 w-5 h-5 fill-muted-foreground"
-              @click="
-                toggleAvailableBalanceVisibility('showFullAvailableBalance')
-              "
-            />
-            <Icons.view
-              v-else
-              class="md:w-7 md:h-7 w-5 h-5 dark:fill-white"
-              @click="
-                toggleAvailableBalanceVisibility('showFullAvailableBalance')
-              "
-            />
+            <Icons.hide v-if="showFullAvailableBalance" class="md:w-7 md:h-7 w-5 h-5 fill-muted-foreground" @click="
+              toggleAvailableBalanceVisibility('showFullAvailableBalance')
+              " />
+            <Icons.view v-else class="md:w-7 md:h-7 w-5 h-5 dark:fill-white" @click="
+              toggleAvailableBalanceVisibility('showFullAvailableBalance')
+              " />
           </div>
           <p class="text-base text-[#CDA352]">
             {{
               isLoading
                 ? "Loading..."
-                : `Merchant AC - ${
-                    transactionData?.[0]?.merchantAccountNumber
-                      ? formatAvailableBalance(
-                          transactionData?.[0]?.merchantAccountNumber,
-                          showFullAvailableBalance,
-                          "merchantAccountNumber"
-                        )
-                      : "N/A"
-                  }`
+                : `Merchant AC - ${transactionData?.[0]?.merchantAccountNumber
+                  ? formatAvailableBalance(
+                    transactionData?.[0]?.merchantAccountNumber,
+                    showFullAvailableBalance,
+                    "merchantAccountNumber"
+                  )
+                  : "N/A"
+                }`
             }}
           </p>
           <p class="text-sm text-muted-foreground">
@@ -271,26 +240,20 @@ watch(
       </UiCard>
 
       <!-- Initiate payment -->
-    <UiPermissionGuard :permission="PermissionConstants.INIT_MERCHANT_TRANSACTION">
-      <UiCard
-        class="col-span-1 lg:col-span-3  max-h-min xl:col-span-4 p-6 space-y-4 w-full"
-      >
-        <h1 class="font-semibold text-xl col-span-full flex-1 w-full block">
-          Initiate Payment
-        </h1>
-        <DashboardInitiatePaymentQRCode />
-      </UiCard>
+      <UiPermissionGuard :permission="PermissionConstants.INIT_MERCHANT_TRANSACTION">
+        <UiCard class="col-span-1 lg:col-span-3  max-h-min min-h-64 xl:col-span-4  p-6 space-y-4 w-full">
+          <h1 class="font-semibold text-xl col-span-full flex-1 w-full block">
+            Initiate Payment
+          </h1>
+          <DashboardInitiatePaymentQRCode />
+        </UiCard>
       </UiPermissionGuard>
     </div>
 
-    <div
-      class="grid gap-4 md:gap-8 max-h-[400px] grid-cols-1 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-9"
-    >
+    <div class="grid gap-4 md:gap-8 max-h-[400px] grid-cols-1 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-9">
       <!-- Account Overview -->
       <!-- <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION"> -->
-      <UiCard
-        class="col-span-1 lg:col-span-4 max-h-[450px] xl:col-span-5 shadow-md rounded-xl"
-      >
+      <UiCard class="col-span-1 lg:col-span-4 max-h-[450px] xl:col-span-5 shadow-md rounded-xl">
         <UiCardHeader>
           <UiCardTitle>Overview</UiCardTitle>
         </UiCardHeader>
@@ -300,11 +263,9 @@ watch(
       </UiCard>
       <!-- </UiPermissionGuard> -->
 
-    <!-- <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION"> -->
+      <!-- <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION"> -->
       <!-- Recent Transactions -->
-      <UiCard
-        class="col-span-1 lg:col-span-3 max-h-[450px] xl:col-span-4 shadow-md rounded-xl"
-      >
+      <UiCard class="col-span-1 lg:col-span-3 max-h-[450px] xl:col-span-4 shadow-md rounded-xl">
         <UiCardHeader>
           <div class="flex justify-between w-full items-center">
             <div class="space-y-1">

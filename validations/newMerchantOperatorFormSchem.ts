@@ -1,6 +1,5 @@
 import { toTypedSchema } from "@vee-validate/zod";
 import { z } from "zod";
-import { OperatorRole } from "~/types";
 
 
 export const newMerchantOperatorFormSchema = toTypedSchema(
@@ -13,6 +12,7 @@ export const newMerchantOperatorFormSchema = toTypedSchema(
     active: z.boolean().optional().default(true),
     operatorCode: z.string().optional().nullable(),
     language: z.string().optional().nullable(),
+    // operatorType: OperatorTypeSchema,
     password: z
       .string()
       .min(6, "Password must be at least 6 characters")
