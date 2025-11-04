@@ -198,6 +198,12 @@ interface AuthResponse {
   }
 }
 
+ enum OperatorType {
+    NONE="NONE",
+    HUMAN="HUMAN",
+    SYSTEM="SYSTEM"
+}
+
 interface Operator {
   merchantOperatorId?: string
   operatorCode: string
@@ -216,6 +222,7 @@ interface Operator {
   merchantBranchId?: string
   merchantId?: string
   userId?: string
+  operatorType: OperatorType
 }
 
 // Update the interface to match the actual data structure

@@ -2,6 +2,11 @@ import { toTypedSchema } from "@vee-validate/zod";
 import { z } from "zod";
 import { OperatorRole } from "~/types";
 
+enum OperatorType {
+  NONE = "NONE",
+  HUMAN = "HUMAN",
+  SYSTEM = "SYSTEM"
+}
 
 export const inviteNewMerchantOperatorFormSchema = toTypedSchema(
   z.object({
@@ -14,5 +19,7 @@ export const inviteNewMerchantOperatorFormSchema = toTypedSchema(
     operatorCode: z.string().optional().nullable(),
     language: z.string().optional().nullable(),
     phoneNumber: z.string(),
+    operatorType: z.nativeEnum(OperatorType),
+
   }
-))
+  ))

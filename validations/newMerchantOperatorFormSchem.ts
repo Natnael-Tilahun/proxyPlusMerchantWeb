@@ -1,6 +1,11 @@
 import { toTypedSchema } from "@vee-validate/zod";
 import { z } from "zod";
 
+enum OperatorType {
+    NONE="NONE",
+    HUMAN="HUMAN",
+    SYSTEM="SYSTEM"
+}
 
 export const newMerchantOperatorFormSchema = toTypedSchema(
   z.object({
@@ -12,7 +17,7 @@ export const newMerchantOperatorFormSchema = toTypedSchema(
     active: z.boolean().optional().default(true),
     operatorCode: z.string().optional().nullable(),
     language: z.string().optional().nullable(),
-    // operatorType: OperatorTypeSchema,
+    operatorType: z.nativeEnum(OperatorType),
     password: z
       .string()
       .min(6, "Password must be at least 6 characters")
