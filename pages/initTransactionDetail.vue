@@ -12,6 +12,7 @@ const showFullAccountId = ref(false);
 const transactionId = ref<string | null>(null);
 const openConfirmationModal = ref(false);
 const qrImgRef = ref<HTMLImageElement | null>(null); // 1. Create the ref
+const isOtpSent = computed(() => route.query.sendOtp === 'true')
 
 const setOpenConfirmationModal = (value: boolean) => {
   openConfirmationModal.value = value;
@@ -136,9 +137,9 @@ watch(receivedMessages, (newVal, oldVal) => {
     </UiCard>
     <div class="w-full md:w-1/2 lg:w-2/5 xl:w-1/3 min-h-max gap-4 flex flex-col">
         <DashboardInitiatePaymentPushUssd class="w-full h-fit"
-          :merchantTransactionId="paymentResponse?.merchantTransactionId" />
-        <DashboardCompleteOtpPayment class="w-full h-fit" v-if="paymentResponse.customerPhone && paymentResponse.sendOtp=='true'"
-          :merchantTransactionId="paymentResponse?.merchantTransactionId" />
+          :merchantTransactionId="paymentResponse?.merchantTransactionId" :customerPhone="paymentResponse.customerPhone"   />
+        <DashboardCompleteOtpPayment class="w-full h-fit" v-if="isOtpSent"
+          :merchantTransactionId="paymentResponse?.merchantTransactionId" :customerPhone="paymentResponse.customerPhone" />
     </div>
 
   </div>

@@ -13,15 +13,17 @@ import { Toast, ToastAction, useToast } from "~/components/ui/toast";
 import type { UserInputForOtp } from "~/types";
 
 const isLoading = ref(false);
-const { completePaymentOtp } = usePayment();
+const { completePaymentOtp, initiatePaymentOtp } = usePayment();
 const { toast } = useToast();
+const route = useRoute()
+const paymentResponse = ref<any>(route.query);
 
 const { handleSubmit, setFieldValue } = useForm({
   validationSchema: completeOtpPaymentFormSchema,
 });
 
 // Define props
-const props = defineProps(["merchantTransactionId"]);
+const props = defineProps(["merchantTransactionId", "customerPhone", ]);
 
 const onSubmit = handleSubmit(async (values: any) => {
   isLoading.value = true;
@@ -34,11 +36,10 @@ const onSubmit = handleSubmit(async (values: any) => {
     const data = await completePaymentOtp(transactionData);
     if (data) {
       toast({
-        title: "Payment paid successfully.",
-        description: data,
+        title: "Payment completed successfully.",
         variant: "default",
       });
-      navigateTo(`/transactions/mine`, { replace: true });
+      // navigateTo(`/transactions/mine`, { replace: true });
     }
   } catch (error) {
     console.error("Otp payment error: ", error);
@@ -46,6 +47,38 @@ const onSubmit = handleSubmit(async (values: any) => {
     isLoading.value = false;
   }
 });
+
+const sendOtpHandler = async () => {
+  // isLoading.value = true;
+  const transactionData = {
+    merchantTransactionId: props.merchantTransactionId,
+    customerPhone: props.customerPhone || paymentResponse.value.customerPhone,
+  };
+
+
+  if(!transactionData.customerPhone){
+    toast({
+      title: "Please insert phone number first",
+      description: "You need to insert a phone number to send an OTP.",
+      variant: "destructive"
+    })
+    return
+  }
+
+  try {
+    const data = await initiatePaymentOtp(transactionData);
+    if (data) {
+      toast({
+        title: "OTP sent successfully.",
+        description: data?.message,
+        variant: "default",
+      });
+      // navigateTo(`/transactions/mine/${merchantTransactionId}`, { replace: true });
+    }
+  } catch (error) {
+    console.error("OTP error: ", error);
+  }
+};
 </script>
 
 <template>
@@ -76,6 +109,9 @@ const onSubmit = handleSubmit(async (values: any) => {
           Complete Payment
         </UiButton>
       </div>
+         <div class="flex justify-end">
+          <UiButton type="button" @click="sendOtpHandler" variant="link">Resend OTP</UiButton>
+        </div>
     </form>
   </UiCard>
 </template>
