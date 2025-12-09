@@ -1,48 +1,22 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
 import { columns } from "~/components/transactions/columns";
 import { useTransactions } from "~/composables/useTransactions";
-import { useRouter } from "vue-router"; // {{ edit_1 }}
-import type { Transaction } from "~/types";
+import { useRouter } from "vue-router";
+import ServerPagination from "~/components/ui/ServerPagination.vue";
 
-const { getAllTransactions } = useTransactions();
-const data = ref<Transaction[]>([]);
-const isLoading = ref(true);
-const isError = ref(false);
-const router = useRouter(); // {{ edit_2 }}
-const transactionFilterStore = useTransactionFilterStore();
-definePageMeta({
-   hideBreadcrumb: true,
-});
+const router = useRouter();
 
-try {
-  const response = await getAllTransactions(" ",
-    "0",
-    "10000000",
-    "DESC");
-    data.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime());
-} catch (error) {
-  console.error("Error fetching transactions:", error);
-  isError.value = true;
-} finally {
-  isLoading.value = false;
-}
-
-const refetch = async () => {
-  try {
-    isLoading.value = true;
-    const response = await getAllTransactions(" ",
-    "0",
-    "10000000",
-    "DESC");
-    data.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
-  } catch (error) {
-    console.error("Error fetching transactions:", error);
-    isError.value = true;
-  } finally {
-    isLoading.value = false;
-  }
-};
+const {
+  transactions: data,
+  total,
+  page,
+  size,
+  loading: isLoading,
+  error: isError,
+  fetchTransactions: refetch,
+  onPageChange,
+  onSizeChange,
+} = useTransactions({ mode: "all" });
 
 const navigateToPrintTransactions = () => {
   router.push({
@@ -76,12 +50,21 @@ const navigateToPrintTransactions = () => {
       <UiLoading />
     </div>
 
-    <UiCard v-else-if="data && !isError" class="p-6">
-      <UiDataTable :columns="columns" :data="data">
+    <UiCard v-else-if="!isError" class="p-6">
+      <UiDataTable :columns="columns" :data="data || []">
         <template v-slot:toolbar="{ table }">
           <TransactionsDataTableFilterbar :refetch="refetch" :table="table" />
         </template>
       </UiDataTable>
+      <div class="py-4">
+        <ServerPagination
+          :page="page"
+          :size="size"
+          :total="total"
+          :on-page-change="onPageChange"
+          :on-size-change="onSizeChange"
+        />
+      </div>
     </UiCard>
 
     <div v-else-if="isError">

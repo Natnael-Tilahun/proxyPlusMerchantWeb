@@ -190,11 +190,26 @@ export interface VerificationRequest {
 
 
 interface AuthResponse {
-  operatorDTO: {},
+  operatorDTO: {
+    merchantOperatorId : string,
+    operatorCode : string,
+    firstName : string,
+    middleName : string,
+    lastName : string,
+    fullName : string,
+    active : boolean,
+    user : User
+  },
   tokenDTO: {
     accessToken?: string;
     refreshToken?: string;
     permissions?: string[];
+    accessTokenExpiresIn?: number;
+    refreshTokenExpiresIn?: number;
+    verificationId?: string;
+    phone?: string;
+    expiryTime?: string;
+    
   }
 }
 

@@ -26,12 +26,30 @@ export const useAuth = () => {
       if (status.value === "error") {
         handleApiError(error);
       }
+      console.log("login response", data);
 
-      if (status.value === "success") {
+      if (data.value?.tokenDTO.accessToken) {
+        console.log("data", data.value);
+        const expiresIn = data.value?.tokenDTO?.accessTokenExpiresIn;
+        const absoluteExpiry =
+          typeof expiresIn === "number" && expiresIn > 0
+            ? expiresIn > 1e10
+              ? expiresIn
+              : Date.now() + expiresIn * 1000
+            : 0;
+        const refreshTokenExpiresIn = data.value?.tokenDTO?.refreshTokenExpiresIn;
+        const absoluteRefreshTokenExpiry =
+          typeof refreshTokenExpiresIn === "number" && refreshTokenExpiresIn > 0
+            ? refreshTokenExpiresIn > 1e10
+              ? refreshTokenExpiresIn
+              : Date.now() + refreshTokenExpiresIn * 1000
+            : 0;
         store.setAuth({
           ...user,
           ...data?.value?.tokenDTO,
           isAuthenticated: data?.value?.tokenDTO?.accessToken ? true : false,
+          accessTokenExpiresIn: absoluteExpiry,
+          refreshTokenExpiresIn: absoluteRefreshTokenExpiry,
         });
         // const profileResponse =  await getProfile();   
         // if(profileResponse){

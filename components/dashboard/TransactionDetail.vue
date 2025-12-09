@@ -12,7 +12,6 @@ import { downloadQrCode } from "~/lib/downloadQrCode";
 const showFullAccountId = ref(false);
 const paymentResponse = ref<Transaction | null>(null);
 const qrImgRef = ref<HTMLImageElement | null>(null); // 1. Create the ref
-const router = useRouter()
 const route = useRoute()
 const isOtpSent = computed(() => route.query.sendOtp === 'true')
 

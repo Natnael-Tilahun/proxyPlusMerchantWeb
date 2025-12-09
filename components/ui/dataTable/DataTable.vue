@@ -106,6 +106,6 @@ const table = useVueTable({
       </UiTable>
     </div>
 
-    <DataTablePaginationVue :table="table" />
+    <!-- <DataTablePaginationVue :table="table" /> -->
   </div>
 </template>
