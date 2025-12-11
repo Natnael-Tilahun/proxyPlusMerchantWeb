@@ -17,6 +17,13 @@ import type {
   Operator,
 } from "~/types";
 
+enum OperatorType {
+  NONE = "NONE",
+  HUMAN = "HUMAN",
+  SYSTEM = "SYSTEM"
+}
+
+
 const { sendMerchantOperatorInvite, getMerchantOperatorRoles } = await useOperators();
 const { getBranches } = useBranches();
 const isError = ref(false);
@@ -142,11 +149,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
               <FormItem class="w-full">
                 <FormLabel> Phone Number </FormLabel>
                 <FormControl>
-                  <UiInput
-                    type="text"
-                    placeholder="Enter operator phone number"
-                    v-bind="componentField"
-                  />
+                  <UiInput type="text" placeholder="Enter operator phone number" v-bind="componentField" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -203,6 +206,26 @@ const onSubmit = form.handleSubmit(async (values: any) => {
                 <FormMessage />
               </FormItem>
             </FormField>
+            <FormField v-slot="{ componentField }" name="operatorType">
+              <FormItem class="w-full">
+                <FormLabel> Operator Type</FormLabel>
+                <UiSelect v-bind="componentField">
+                  <FormControl>
+                    <UiSelectTrigger>
+                      <UiSelectValue placeholder="Select a operator type" />
+                    </UiSelectTrigger>
+                  </FormControl>
+                  <UiSelectContent>
+                    <UiSelectGroup>
+                      <UiSelectItem v-for="item in Object.values(OperatorType)" :value="item">
+                        {{ item }}
+                      </UiSelectItem>
+                    </UiSelectGroup>
+                  </UiSelectContent>
+                </UiSelect>
+                <FormMessage />
+              </FormItem>
+            </FormField>
             <FormField v-slot="{ componentField }" name="language">
               <FormItem>
                 <FormLabel>Language </FormLabel>
@@ -221,19 +244,17 @@ const onSubmit = form.handleSubmit(async (values: any) => {
               </FormItem>
             </FormField>
 
-            <UiPermissionGuard
-              :permission="PermissionConstants.CREATE_MERCHANT_OPERATOR"
-            >
-            <div class="col-span-full w-full py-4 flex justify-between">
-              <UiButton :disabled="isSubmitting" variant="outline" type="button" @click="$router.go(-1)">
-                Cancel
-              </UiButton>
-              <UiButton :disabled="isSubmitting" type="submit">
-                <Icon name="svg-spinners:8-dots-rotate" v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin"></Icon>
+            <UiPermissionGuard :permission="PermissionConstants.CREATE_MERCHANT_OPERATOR">
+              <div class="col-span-full w-full py-4 flex justify-between">
+                <UiButton :disabled="isSubmitting" variant="outline" type="button" @click="$router.go(-1)">
+                  Cancel
+                </UiButton>
+                <UiButton :disabled="isSubmitting" type="submit">
+                  <Icon name="svg-spinners:8-dots-rotate" v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin"></Icon>
 
-                Create
-              </UiButton>
-            </div>
+                  Create
+                </UiButton>
+              </div>
             </UiPermissionGuard>
           </div>
         </form>

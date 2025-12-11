@@ -14,8 +14,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return navigateTo("/login", { replace: true });
   }
 
-  if (isTokenExpired(authStore.accessToken)) {
-    if (authStore.refreshToken) {
+  if (isTokenExpired(authStore.accessTokenExpiresIn)) {
+    if (authStore.refreshToken && isTokenExpired(authStore.refreshTokenExpiresIn)) {
       try {
         const { data, error } = await api.fetch(
           "/api/v1/internal/auth/refresh-token",
@@ -32,10 +32,25 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
           throw new Error("Error refreshing token");
         }
         console.log("refresh token data.value", data.value);
+        const expiresIn = data.value.accessTokenExpiresIn;
+        const refreshTokenExpiresIn = data.value.refreshTokenExpiresIn;
+        const absoluteExpiry =
+          typeof expiresIn === "number" && expiresIn > 0
+            ? expiresIn > 1e10
+              ? expiresIn
+              : Date.now() + expiresIn * 1000
+            : 0;
+        const absoluteRefreshTokenExpiry =
+          typeof refreshTokenExpiresIn === "number" && refreshTokenExpiresIn > 0
+            ? refreshTokenExpiresIn > 1e10
+              ? refreshTokenExpiresIn
+              : Date.now() + refreshTokenExpiresIn * 1000
+            : 0;
         authStore.$patch({
           refreshToken: data.value.refreshToken,
           accessToken: data.value.accessToken,
-          refreshTokenExpiresIn: data.value.refreshTokenExpiresIn,
+          accessTokenExpiresIn: absoluteExpiry,
+          refreshTokenExpiresIn: absoluteRefreshTokenExpiry,
         });
       } catch (error) {
         console.error("Token refresh failed:", error);

@@ -1,37 +1,70 @@
 import { Toast, ToastAction, toast, useToast } from "~/components/ui/toast";
 import type { Branch } from "~/types";
 import { handleApiError, type ApiResult } from "~/types/api";
+import { usePagination } from "./usePagination";
+import { watch, computed } from "vue";
 
-export const useBranches = () => {
+// Update export to accept options
+export const useBranches = (options: {
+  mode?: "all" | "mine";
+  autoFetch?: boolean;
+} = {}) => {
+  const { mode = "all", autoFetch = false } = options;
   const runtimeConfig = useRuntimeConfig();
   const isLoading = ref<boolean>(false);
   const store = useAuthStore();
   const { fetch } = useApi();
 
-    const getBranches: (
-      page?: number,
-      size?: number
-    ) => ApiResult<Branch[]> = async ( page, size) => {
-      try {
-        const { data, pending, error, status } = await fetch<Branch[]>(
-          `/api/v1/merchants/branches2`,
-          {
-            params: { page, size },
-          }
-        );
-  
-        isLoading.value = pending.value;
-  
-        if (status.value === "error") {
-          handleApiError(error);
-        }
-  
-        return data.value ? (data.value as unknown as Branch[]) : null;
-      } catch (err) {
-        
-        throw err;
+  // Determine endpoint based on mode
+  const endpoint = computed(() => {
+    if (mode === "mine") {
+       const myBranchId = store.profile?.merchantBranch?.merchantBranchId;
+       if (myBranchId) {
+           return `/api/v1/merchants/branches2/${myBranchId}`;
+       }
+       return null; // or some fallback
+    }
+    return "/api/v1/merchants/branches2";
+  });
+
+  // --- Pagination & State for Main List ---
+  const {
+    data: branches,
+    total,
+    page,
+    size,
+    loading,
+    error,
+    fetchData: fetchBranches,
+    onPageChange,
+    onSizeChange,
+    filters,
+    onFiltersChange
+  } = usePagination<Branch>({
+    endpoint: endpoint,
+    options: {
+        autoFetch: false 
+    }
+  });
+
+  // Watch for pagination changes to auto-refetch
+  watch([page, size], async () => {
+    await fetchBranches();
+  });
+
+  // Watch endpoint changes if in mine mode (e.g. login happens later)
+  watch(endpoint, async (newVal) => {
+      if (newVal && (autoFetch || mode === 'mine')) {
+          await fetchBranches();
       }
-    };
+  }, { immediate: autoFetch });
+
+  const getBranches = async (p?: number, s?: number) => {
+     if (p !== undefined) page.value = p + 1;
+     if (s !== undefined) size.value = s;
+     await fetchBranches();
+     return branches.value;
+  };
 
   const getBranchById: (id: string) => ApiResult<Branch> = async ( id) => {
     try {
@@ -154,7 +187,18 @@ export const useBranches = () => {
 
   return {
     getBranches,
-    isLoading,
+    branches,
+    total,
+    page,
+    size,
+    loading,
+    error,
+    fetchBranches,
+    onPageChange,
+    onSizeChange,
+    filters,
+    onFiltersChange,
+    isLoading, // keep for other actions
     getBranchById,
     createNeweMerchantBranch,
     deleteMerchantBranch,

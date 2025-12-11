@@ -50,6 +50,17 @@ interface UserInput {
   password: string;
 }
 
+interface UserInputForPushUssd {
+  merchantTransactionId: string;
+  customerPhone: string;
+}
+
+interface UserInputForOtp {
+  merchantTransactionId: string;
+  customerPhone?: string;
+  customerOtp?: string
+}
+
 interface UserWithoutPassword {
   email: string;
   id: string;
@@ -179,12 +190,33 @@ export interface VerificationRequest {
 
 
 interface AuthResponse {
-  operatorDTO : {},
-  tokenDTO : {
-  accessToken?: string;
-  refreshToken?: string;
-  permissions?: string[];
+  operatorDTO: {
+    merchantOperatorId : string,
+    operatorCode : string,
+    firstName : string,
+    middleName : string,
+    lastName : string,
+    fullName : string,
+    active : boolean,
+    user : User
+  },
+  tokenDTO: {
+    accessToken?: string;
+    refreshToken?: string;
+    permissions?: string[];
+    accessTokenExpiresIn?: number;
+    refreshTokenExpiresIn?: number;
+    verificationId?: string;
+    phone?: string;
+    expiryTime?: string;
+    
   }
+}
+
+ enum OperatorType {
+    NONE="NONE",
+    HUMAN="HUMAN",
+    SYSTEM="SYSTEM"
 }
 
 interface Operator {
@@ -205,6 +237,7 @@ interface Operator {
   merchantBranchId?: string
   merchantId?: string
   userId?: string
+  operatorType: OperatorType
 }
 
 // Update the interface to match the actual data structure

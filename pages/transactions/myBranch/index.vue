@@ -4,49 +4,62 @@ import { columns } from "~/components/myBranchTransactions/columns";
 import { useTransactions } from "~/composables/useTransactions";
 import { useRouter } from "vue-router"; // {{ edit_1 }}
 import type { Transaction } from "~/types";
+import ServerPagination from "~/components/ui/ServerPagination.vue";
 
-const { getTransactionsByBranchId } = useTransactions();
-const data = ref<Transaction[]>([]);
-const isLoading = ref(true);
-const isError = ref(false);
+// const { getTransactionsByBranchId } = useTransactions();
+// const data = ref<Transaction[]>([]);
+// const isLoading = ref(true);
+// const isError = ref(false);
 const router = useRouter(); // {{ edit_2 }}
-const transactionFilterStore = useTransactionFilterStore();
-const myBranchId = ref<string>()
-const store = useAuthStore()
-myBranchId.value = store.profile?.merchantBranch?.merchantBranchId
+// const transactionFilterStore = useTransactionFilterStore();
+const myBranchId = ref<string>();
+const store = useAuthStore();
+myBranchId.value = store.profile?.merchantBranch?.merchantBranchId;
 
 definePageMeta({
-   hideBreadcrumb: true,
+  hideBreadcrumb: true,
 });
 
-try {
-  const response = await getTransactionsByBranchId(myBranchId.value, " ",
-    "0",
-    "1000000000",
-    "DESC");
-    data.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime());
-  } catch (error) {
-  console.error("Error fetching branch transactions:", error);
-  isError.value = true;
-} finally {
-  isLoading.value = false;
-}
+// try {
+//   const response = await getTransactionsByBranchId(myBranchId.value, " ",
+//     "0",
+//     "1000000000",
+//     "DESC");
+//     data.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime());
+//   } catch (error) {
+//   console.error("Error fetching branch transactions:", error);
+//   isError.value = true;
+// } finally {
+//   isLoading.value = false;
+// }
 
-const refetch = async () => {
-  try {
-    isLoading.value = true;
-    const response = await getTransactionsByBranchId(myBranchId.value, " ",
-    "0",
-    "1000000000",
-    "DESC");
-    data.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
-  } catch (error) {
-    console.error("Error fetching branch transactions:", error);
-    isError.value = true;
-  } finally {
-    isLoading.value = false;
-  }
-};
+// const refetch = async () => {
+//   try {
+//     isLoading.value = true;
+//     const response = await getTransactionsByBranchId(myBranchId.value, " ",
+//     "0",
+//     "1000000000",
+//     "DESC");
+//     data.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
+//   } catch (error) {
+//     console.error("Error fetching branch transactions:", error);
+//     isError.value = true;
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
+
+const {
+  transactions: data,
+  total,
+  page,
+  size,
+  loading: isLoading,
+  error: isError,
+  fetchTransactions: refetch,
+  onPageChange,
+  onSizeChange,
+} = useTransactions({ mode: "branch", branchId: myBranchId.value });
 
 const navigateToPrintTransactions = () => {
   router.push({
@@ -86,6 +99,15 @@ const navigateToPrintTransactions = () => {
           <TransactionsDataTableFilterbar :refetch="refetch" :table="table" />
         </template>
       </UiDataTable>
+      <div class="py-4">
+        <ServerPagination
+          :page="page"
+          :size="size"
+          :total="total"
+          :on-page-change="onPageChange"
+          :on-size-change="onSizeChange"
+        />
+      </div>
     </UiCard>
 
     <div v-else-if="isError">

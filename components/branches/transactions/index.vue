@@ -2,50 +2,39 @@
 import { ref, computed } from "vue";
 import { columns } from "~/components/branches/transactions/columns";
 import { useTransactions } from "~/composables/useTransactions";
-import { useRouter } from "vue-router"; // {{ edit_1 }}
+import { useRouter } from "vue-router";
 import type { Transaction } from "~/types";
 import { getIdFromPath } from "~/lib/utils";
+import ServerPagination from "~/components/ui/ServerPagination.vue";
 
-const { getAllTransactions, getTransactionsByBranchId } = useTransactions();
-const data = ref<Transaction[]>([]);
-const isLoading = ref(false);
-const isError = ref(false);
-const router = useRouter(); // {{ edit_2 }}
-const transactionFilterStore = useTransactionFilterStore();
-const branchId = ref<string>("");
-branchId.value = getIdFromPath();
+const branchId = getIdFromPath();
 
+// Use the main hook with branch mode
+const {
+  transactions: data,
+  total,
+  page,
+  size,
+  loading: isLoading,
+  error: isError,
+  fetchTransactions: refetch,
+  onPageChange,
+  onSizeChange,
+} = useTransactions({
+  mode: "branch",
+  branchId: branchId,
+  autoFetch: true,
+  ignoreStore: false,
+});
 
-try {
-  isLoading.value = true
-  const response = await getTransactionsByBranchId(branchId.value);
-    data.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime()) ;
-} catch (error) {
-  console.error("Error fetching transactions:", error);
-  isError.value = true;
-} finally {
-  isLoading.value = false;
-}
-
-const refetch = async () => {
-  try {
-    isLoading.value = true;
-   const response = await getTransactionsByBranchId(branchId.value);
-    data.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
-  } catch (error) {
-    console.error("Error fetching transactions:", error);
-    isError.value = true;
-  } finally {
-    isLoading.value = false;
-  }
-};
+const router = useRouter();
 
 const navigateToPrintTransactions = () => {
   router.push({
-    path: `/branches/${branchId.value}`,
-    query : {
-      activeTab: "downloadTransactions"
-    }
+    path: `/branches/${branchId}`,
+    query: {
+      activeTab: "downloadTransactions",
+    },
   });
 };
 </script>
@@ -76,11 +65,20 @@ const navigateToPrintTransactions = () => {
     </div>
 
     <UiCard v-else-if="data && !isError && !isLoading" class="p-6">
-      <UiDataTable :columns="columns" :data="data">
+      <UiDataTable :columns="columns" :data="data || []">
         <template v-slot:toolbar="{ table }">
           <TransactionsDataTableFilterbar :refetch="refetch" :table="table" />
         </template>
       </UiDataTable>
+      <div class="py-4">
+        <ServerPagination
+          :page="page"
+          :size="size"
+          :total="total"
+          :on-page-change="onPageChange"
+          :on-size-change="onSizeChange"
+        />
+      </div>
     </UiCard>
 
     <div v-else-if="isError || data == null || data == undefined">
