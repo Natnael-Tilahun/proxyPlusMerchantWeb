@@ -5,7 +5,6 @@ import Sidebar from "~/components/layout/sidebar/Sidebar.vue";
 import OpenSidebarIcon from "~/components/layout/sidebar/OpenSidebarIcon.vue";
 import CloseSidebarIcon from "~/components/layout/sidebar/CloseSidebarIcon.vue";
 
-
 const LOCAL_STORAGE_THEME_KEY = "theme";
 
 const route = useRoute();
@@ -13,8 +12,7 @@ const fullPath = ref(route.path);
 const pathSegments = ref([]);
 pathSegments.value = splitPath(fullPath.value);
 
-console.log("route.meta.hideBreadcrumb: ", route.meta.hideBreadcrumb)
-
+console.log("route.meta.hideBreadcrumb: ", route.meta.hideBreadcrumb);
 
 watch(
   () => route.path,
@@ -75,7 +73,7 @@ const closeMenuNav = () => {
 
 <template>
   <div
-    class="w-full h-screen overflow-hidden bg-primary   dark:bg-card text-foreground dark:text-gray-100 grid grid-cols-12 lg:grid-cols-9 xl:grid-cols-7"
+    class="w-full h-screen overflow-hidden bg-primary dark:bg-card text-foreground dark:text-gray-100 grid grid-cols-12 lg:grid-cols-9 xl:grid-cols-7"
     :class="[
       {
         ' relative h-screen  w-full': !isSidebarCollapsed,
@@ -102,7 +100,7 @@ const closeMenuNav = () => {
     />
 
     <div
-      class="col-span-full overflow-scroll md:col-span-9 lg:col-span-7 xl:col-span-6 md:flex bg-gradient-body dark:bg-gradient-body-dark"
+      class="col-span-full overflow-scroll md:col-span-9 lg:col-span-7 xl:col-span-6 md:flex bg-accent dark:bg-accent-dark"
       :class="[
         {
           'w-full   h-full top-0 left-0   flex-col md:flex md:rounded-tl-2xl md:rounded-bl-2xl':
@@ -136,7 +134,7 @@ const closeMenuNav = () => {
               variant="ghost"
               size="icon"
               @click="toggleTheme"
-              class="bg-primary text-primary-foreground hover:bg-gray-300  dark:text-white rounded-full"
+              class="bg-primary text-primary-foreground hover:bg-gray-300 dark:text-white rounded-full"
             >
               <Icon
                 v-if="colorMode === 'dark'"

@@ -15,22 +15,31 @@ const { getTransactionsByBranchId } = useTransactions();
 const startDate = ref<Date>();
 const endDate = ref<Date>();
 const selectedAccount = ref<string>();
-  const myBranchId = ref<string>()
-const store = useAuthStore()
-myBranchId.value = store.profile?.merchantBranch?.merchantBranchId
+const myBranchId = ref<string>();
+const store = useAuthStore();
+myBranchId.value = store.profile?.merchantBranch?.merchantBranchId;
 
 // Fetch transaction data based on the account ID or other parameters
 async function fetchTransactionData() {
   try {
     const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  yesterday.setHours(0, 0, 0, 0);
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
     isLoading.value = true;
-    const response = await getTransactionsByBranchId(myBranchId.value, " ",
-    "0",
-    "1000000000",
-    "DESC");
-    transactionData.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime());
+    const response = await getTransactionsByBranchId(
+      myBranchId.value,
+      " ",
+      "0",
+      "1000000000",
+      "DESC"
+    );
+    transactionData.value = response
+      ?.slice()
+      ?.sort(
+        (a, b) =>
+          new Date(b.expirationDate).getTime() -
+          new Date(a.expirationDate).getTime()
+      );
     selectedAccount.value = transactionData.value[0]?.merchantAccountNumber;
   } catch (error) {
     console.error("Error fetching transactions:", error);
@@ -148,7 +157,7 @@ function downloadStatement() {
       class="bg-[#FCFCFC] dark:bg-secondary md:space-y-2 w-full py-4 md:px-7 px-4 border rounded-md"
     >
       <div class="gap-2 justify-between grid grid-cols-1 md:grid-cols-3">
-        <img src="/cbe-logo.png" class="md:w-fit h-fit" alt="Logo" />
+        <img src="/logo1.png" class="md:w-fit h-fit" alt="Logo" />
         <div class="md:space-y-2 space-y-0 flex flex-col lg:items-center">
           <h1 class="lg:text-xl md:text-lg text-sm">
             My Branch <span> </span> Transaction <span> </span> Statement
@@ -157,9 +166,11 @@ function downloadStatement() {
             class="flex items-center text-primary text-xs md:text-sm lg:text-base gap-4 tracking-wider"
           >
             <p class="">
-              {{ startDate ? startDate?.toLocaleDateString() : ""  }}
+              {{ startDate ? startDate?.toLocaleDateString() : "" }}
             </p>
-            <span class="text-accent-foreground"> {{startDate ? "-" : ""}}</span>
+            <span class="text-accent-foreground">
+              {{ startDate ? "-" : "" }}</span
+            >
             <p class="">
               {{ endDate ? endDate?.toLocaleDateString() : "" }}
             </p>
@@ -198,7 +209,8 @@ function downloadStatement() {
             <UiTableHead class="uppercase font-semibold text-xs md:text-sm"
               >Transaction ID</UiTableHead
             >
-            <UiTableHead class="uppercase text-left font-semibold md:text-sm text-xs"
+            <UiTableHead
+              class="uppercase text-left font-semibold md:text-sm text-xs"
               >Payment Reference</UiTableHead
             >
             <UiTableHead

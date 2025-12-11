@@ -29,82 +29,45 @@ const clearStaleSessions = () => {
     window.location.href = "/login";
   }
 };
-
 </script>
 
 <template>
-  <div
-    class="container bg-gradient-body dark:bg-gradient-body-dark rounded-l-3xl relative h-[800px] md:h-screen flex flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0"
-  >
-    <!-- Background Image Section -->
+  <div class="min-h-screen flex items-center justify-center bg-muted/30 p-4">
+    <!-- Login Card -->
     <div
-      class="relative hidden h-screen flex-col bg-muted p-0 text-white dark:border-r lg:flex"
+      class="w-full max-w-md space-y-8 bg-background rounded-xl shadow-lg border p-8"
     >
-      <div
-        class="w-full h-full bg-cover bg-center contrast-75"
-        style="background-image: url('/Ethiopia_Commercial-Bank_building.jpeg')"
-      ></div>
-      <div class="absolute bottom-0 z-20 p-5 mt-auto">
-        <blockquote class="space-y-2">
-          <p class="text-lg text-secondary/80 contrast-200">
-            &ldquo;The Bank You Can Always Rely On&rdquo;
-          </p>
-          <footer class="text-sm">Commercial bank of Ethiopia</footer>
-        </blockquote>
+      <div class="flex flex-col space-y-2 text-center">
+        <h1 class="text-3xl font-bold text-primary tracking-tight">Proxy+</h1>
+        <p class="text-sm text-muted-foreground">Proxy+ Merchant Web</p>
       </div>
-    </div>
 
-    <!-- Login Form Section -->
-    <div
-      class="md:p-8 p-5 shadow-md rounded-md border-[0.5px] lg:border-none lg:shadow-none"
-    >
+      <!-- Error Message Display -->
       <div
-        class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[400px] bg-accent/50 dark:bg-accent/30 p-16 shadow-none rounded-md"
+        v-if="errorMessage"
+        class="p-3 bg-destructive/10 border border-destructive/20 rounded-md text-center"
       >
-        <div class="flex flex-col justify-center items-center space-y-2 text-center">
-          <img src="/logo.png" alt="CBE Logo" class="w-20 h-20">
-
-           <div class="flex items-center" >
-           <h1 class="w-full text-3xl text-primary font-bold">CBE Merchant App</h1>
-          </div>
-
-          <h1 class="text-xl font-semibold tracking-tight text-left">Login</h1>
-          <!-- <p class="text-sm text-muted-foreground">
-            Enter your email(username) and password below to login
-          </p> -->
-        </div>
-              <!-- Error Message Display -->
-              <div
-          v-if="errorMessage"
-          class="p-3 bg-destructive/10 border border-destructive/20 rounded-md"
+        <p class="text-sm text-destructive font-medium">{{ errorMessage }}</p>
+        <button
+          @click="clearStaleSessions"
+          class="mt-2 text-xs text-primary hover:underline font-medium"
         >
-          <p class="text-sm text-destructive">{{ errorMessage }}</p>
-          <button
-            @click="clearStaleSessions"
-            class="mt-2 text-xs text-blue-600 hover:text-blue-800 underline"
-          >
-            Clear stale sessions and try again
-          </button>
+          Clear stale sessions and try again
+        </button>
+      </div>
+
+      <div class="space-y-6">
+        <div class="flex flex-col space-y-2 text-center">
+          <h2 class="text-xl font-semibold tracking-tight">Login</h2>
+          <p class="text-sm text-muted-foreground">
+            Enter your credentials to access the system
+          </p>
         </div>
-        
+
         <LoginForm />
-        <p class="px-8 text-center font-light text-sm text-muted-foreground">
-          By clicking continue, you agree to our
-          <a
-            href="/terms"
-            class="underline underline-offset-4 hover:text-primary"
-          >
-            Terms of Service
-          </a>
-          and
-          <a
-            href="/privacy"
-            class="underline underline-offset-4 hover:text-primary"
-          >
-            Privacy Policy
-          </a>
-          .
-        </p>
+      </div>
+
+      <div class="pt-4 border-t">
         <UiCopyright />
       </div>
     </div>

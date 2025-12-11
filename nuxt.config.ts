@@ -51,7 +51,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: "CBE Merchant Site",
+      title: "Proxy+ Merchant Site",
       link: [],
     },
   },
