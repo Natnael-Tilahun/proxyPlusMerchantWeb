@@ -12,8 +12,9 @@ export const useTransactions = (options: {
   mode?: "all" | "mine" | "operator" | "branch";
   operatorId?: string;
   branchId?: string;
+  ignoreStore?: boolean;
 } = {}) => {
-  const { autoFetch = true, mode = "all" } = options;
+  const { autoFetch = true, mode = "all", ignoreStore = false } = options;
   const runtimeConfig = useRuntimeConfig();
   const store = useAuthStore();
   const transactionFilterStore = useTransactionFilterStore();
@@ -92,7 +93,9 @@ export const useTransactions = (options: {
   };
 
   const fetchData = async () => {
-    filters.value = getFilters();
+    if (!ignoreStore) {
+      filters.value = getFilters();
+    }
     await fetchPagination();
   };
 
@@ -985,6 +988,7 @@ export const useTransactions = (options: {
     onPageChange,
     onSizeChange,
     onSortChange,
+    filters,
     onFiltersChange,
 
     getMyTransactions,

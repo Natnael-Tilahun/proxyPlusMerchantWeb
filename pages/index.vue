@@ -1,20 +1,46 @@
+```vue
 <script setup lang="ts">
 import { Skeleton } from "~/components/ui/skeleton";
 import { Icons } from "~/components/icons";
 import type { Transaction } from "~/types";
 import { PermissionConstants } from "~/constants/permissions";
 
-const { getAllTransactions, getMyTransactions } = useTransactions();
-const isLoading = ref(true);
-const transactionData = ref<Transaction[]>([]);
-const allTransactions = ref<Transaction[]>([]);
-const todaysTransactions = ref<Transaction[]>([]);
+// --- Recent Sales (List) ---
+const {
+  transactions: recentTransactionsRaw,
+  loading: recentLoading,
+  size: recentSize,
+  sort: recentSort,
+  fetchTransactions: fetchRecent,
+} = useTransactions({
+  mode: "mine",
+  ignoreStore: true,
+  autoFetch: false, // Prevent double fetch
+});
+
+const recentTransactions = computed(() => recentTransactionsRaw.value || []);
+
+// --- Sales Stats (Overview & Totals) ---
+// We fetch a larger dataset (e.g. Current Year) once, and filter locally for Daily/Weekly
+// Use numeric autoFetch: false to manually control trigger
+const {
+  transactions: statsTransactionsRaw,
+  loading: statsLoading,
+  fetchTransactions: fetchStats,
+  filters: statsFilters,
+  size: statsSize,
+  sort: statsSort, // Ensure we can sort if needed, though default is fine
+} = useTransactions({
+  mode: "mine",
+  ignoreStore: true,
+  autoFetch: false,
+});
+
+const statsTransactions = computed(() => statsTransactionsRaw.value || []);
+
 const showFullAvailableBalance = ref(false);
 const showFullCurrentBalance = ref(false);
 const currentPaymentSummaryOption = ref("Daily");
-const transactionsNumber = ref();
-
-
 const paymentSummaryOptions = computed(() => [
   "Daily",
   "Weekly",
@@ -22,215 +48,222 @@ const paymentSummaryOptions = computed(() => [
   "Yearly",
 ]);
 
-function formatAvailableBalance(
-  balance: string,
-  showFullBalance: any,
-  type: string
-) {
-  if (showFullBalance) {
-    return balance;
-  } else {
-    if (type == "balance") {
-      return "*".repeat(balance.length);
-    } else {
-      const firstFourDigits = balance.substring(0, 4);
-      const lastTwoDigits = balance.substring(balance.length - 2);
-      const asterisks = "*".repeat(balance.length - 6);
-      return `${firstFourDigits}${asterisks}${lastTwoDigits}`;
-    }
-  }
+// --- Initialization ---
+onMounted(() => {
+  // 1. Fetch Recent Sales
+  recentSize.value = 20;
+  recentSort.value = "expirationDate,DESC";
+  fetchRecent();
+
+  // 2. Fetch Stats Data (One big fetch for the Year)
+  initStatsFetch();
+});
+
+function initStatsFetch() {
+  const today = new Date();
+  const startOfYear = new Date(today.getFullYear(), 0, 1, 0, 0, 0, 0);
+
+  statsFilters.value = {
+    "expirationDate.greaterThanOrEqual": startOfYear.toISOString(),
+    "paymentStatus.equals": "COMPLETED",
+  };
+
+  statsSize.value = 1000; // Limit to 1000 for performance, ideally backend handles aggregation
+  fetchStats();
 }
 
-function toggleAvailableBalanceVisibility(showFullBalance: string) {
-  if (showFullBalance == "showFullAvailableBalance") {
-    showFullAvailableBalance.value = !showFullAvailableBalance.value;
-  } else {
-    showFullCurrentBalance.value = !showFullCurrentBalance.value;
-  }
-}
+// --- Computed Stats (Local Filtering) ---
+// This runs instantly when 'currentPaymentSummaryOption' changes
+const filteredStatsTransactions = computed(() => {
+  const transactions = statsTransactions.value;
+  if (!transactions.length) return [];
 
-const totalTransactionAmount = computed(() => {
   const today = new Date();
   let startOfPeriod = new Date();
   let endOfPeriod = new Date();
+  // Determine start/end based on selection
+  // Note: API already filtered >= Start of Year, so we just narrow it down further
 
   switch (currentPaymentSummaryOption.value) {
     case "Daily":
-      transactionsNumber.value = todaysTransactions.value.length;
-      return todaysTransactions.value.reduce(
-        (sum, transaction) => sum + transaction.amount,
-        0
-      );
+      startOfPeriod.setHours(0, 0, 0, 0);
+      endOfPeriod.setHours(23, 59, 59, 999);
+      break;
     case "Weekly":
-      // Set to start of week (Sunday)
       startOfPeriod.setDate(today.getDate() - today.getDay());
       startOfPeriod.setHours(0, 0, 0, 0);
-      // Set to end of week (Saturday 23:59:59)
       endOfPeriod = new Date(startOfPeriod);
       endOfPeriod.setDate(startOfPeriod.getDate() + 6);
       endOfPeriod.setHours(23, 59, 59, 999);
       break;
     case "Monthly":
-      // Start of month
-      startOfPeriod = new Date(today.getFullYear(), today.getMonth(), 1, 0, 0, 0, 0);
-      // End of month
-      endOfPeriod = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59, 999);
+      startOfPeriod.setDate(1); // 1st of current month
+      startOfPeriod.setHours(0, 0, 0, 0);
+      endOfPeriod = new Date(
+        today.getFullYear(),
+        today.getMonth() + 1,
+        0,
+        23,
+        59,
+        59,
+        999
+      );
       break;
     case "Yearly":
-      // Start of year
-      startOfPeriod = new Date(today.getFullYear(), 0, 1, 0, 0, 0, 0);
-      // End of year
+      startOfPeriod.setMonth(0, 1);
+      startOfPeriod.setHours(0, 0, 0, 0);
       endOfPeriod = new Date(today.getFullYear(), 11, 31, 23, 59, 59, 999);
       break;
-    default:
-      return 0; // Fallback
   }
-  // Filter transactions based on the selected period
-  const filteredTransactions = transactionData.value.filter((transaction) => {
-    const transactionDate = new Date(transaction.expirationDate);
-    return transactionDate >= startOfPeriod && transactionDate <= endOfPeriod;
+
+  return transactions.filter((t) => {
+    const tDate = new Date(t.expirationDate);
+    return tDate >= startOfPeriod && tDate <= endOfPeriod;
   });
-  transactionsNumber.value = filteredTransactions.length;
-  return filteredTransactions.reduce(
-    (sum, transaction) => sum + transaction.amount,
+});
+
+const totalTransactionAmount = computed(() => {
+  return filteredStatsTransactions.value.reduce(
+    (sum, transaction) => sum + (transaction.amount || 0),
     0
   );
 });
 
-try {
-  // Get yesterday's date in ISO string format
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  yesterday.setHours(0, 0, 0, 0);
-  // transactionData.value = await getAllTransactions(
-  //   " ",
-  //   "0",
-  //   "100000000000",
-  //   "DESC",
-  //   // `${yesterday.toISOString()}`
-  // ) || [];
-  const response = await getMyTransactions(" ",
-    "0",
-    "1000000000",
-    "DESC");
-  allTransactions.value = (response || [])
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(b.expirationDate).getTime() -
-        new Date(a.expirationDate).getTime()
-    );
-  transactionData.value = allTransactions.value.filter(
-    (transaction) => transaction.paymentStatus === "COMPLETED"
-  );
-  todaysTransactions.value = transactionData.value.filter((transaction) => {
-    const transactionDate = new Date(transaction.expirationDate); // Assuming 'date' is the field for transaction date
-    const today = new Date();
-    return (
-      transactionDate.getDate() === today.getDate() &&
-      transactionDate.getMonth() === today.getMonth() &&
-      transactionDate.getFullYear() === today.getFullYear()
-    );
-  });
-  transactionsNumber.value = todaysTransactions.value.length;
-} catch (error) {
-  console.error("Error fetching data:", error);
-} finally {
-  isLoading.value = false;
+const transactionsNumber = computed(
+  () => filteredStatsTransactions.value.length
+);
+
+// --- Helpers ---
+function formatAvailableBalance(
+  balance: string | number,
+  showFullBalance: boolean,
+  type: string
+) {
+  const balanceStr = balance.toString();
+  if (showFullBalance) {
+    return balanceStr;
+  } else {
+    if (type == "balance") {
+      return "*".repeat(balanceStr.length);
+    } else {
+      const firstFourDigits = balanceStr.substring(0, 4);
+      const lastTwoDigits = balanceStr.substring(balanceStr.length - 2);
+      const asterisks = "*".repeat(
+        balanceStr.length - 6 > 0 ? balanceStr.length - 6 : 4
+      );
+      return `${firstFourDigits}${asterisks}${lastTwoDigits}`;
+    }
+  }
 }
 
-watch(
-  transactionData,
-  (newData) => {
-    // console.log("Transaction Data in index.vue:", newData);
-  },
-  { immediate: true }
-);
+function toggleAvailableBalanceVisibility(type: string) {
+  if (type == "showFullAvailableBalance") {
+    showFullAvailableBalance.value = !showFullAvailableBalance.value;
+  } else {
+    showFullCurrentBalance.value = !showFullCurrentBalance.value;
+  }
+}
 </script>
 
 <template>
-  <div class="md:space-y-8 space-y-6 ">
-    <!-- Loading Indicator Skeleton -->
-    <div class="grid gap-4 lg:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3" v-if="isLoading">
-      <div class="h-32 flex flex-col gap-4 shadow-md rounded-3xl p-8">
-        <UiSkeleton class="h-32 w-20 bg-slate-300" />
-        <UiSkeleton class="h-32 w-10 bg-slate-300" />
-        <UiSkeleton class="h-32 w-20 bg-slate-300" />
-      </div>
-      <div class="h-32 flex flex-col gap-4 shadow-md rounded-3xl p-8">
-        <UiSkeleton class="h-32 w-20 bg-slate-300" />
-        <UiSkeleton class="h-32 w-10 bg-slate-300" />
-        <UiSkeleton class="h-32 w-20 bg-slate-300" />
-      </div>
-      <div class="h-32 flex flex-col gap-4 shadow-md rounded-3xl p-8">
-        <UiSkeleton class="h-32 w-20 bg-slate-300" />
-        <UiSkeleton class="h-32 w-10 bg-slate-300" />
-        <UiSkeleton class="h-32 w-20 bg-slate-300" />
-      </div>
-    </div>
-
-    <div v-else class="grid gap-4 md:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-9">
+  <div class="md:space-y-8 space-y-6">
+    <!-- Main Content Grid -->
+    <div
+      class="grid gap-4 md:gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-9"
+    >
       <!-- Account list and total balance -->
       <UiCard
-        class="col-span-1 lg:col-span-4 xl:col-span-5 max-h-[300px] shadow-md rounded-3xl flex flex-col justify-between relative">
-        <img src="/backgroundMap.png" alt="background"
-          class="opacity-90 dark:opacity-50 absolute top-0 left-0 w-full h-full z-0" />
-        <UiCardHeader class="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-          <UiCardTitle class="font-semibold text-primary text-xl">My {{ currentPaymentSummaryOption }} Sales
+        class="col-span-1 lg:col-span-4 xl:col-span-5 max-h-[300px] shadow-md rounded-3xl flex flex-col justify-between relative"
+      >
+        <img
+          src="/backgroundMap.png"
+          alt="background"
+          class="opacity-90 dark:opacity-50 absolute top-0 left-0 w-full h-full z-0"
+        />
+        <UiCardHeader
+          class="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10"
+        >
+          <UiCardTitle class="font-semibold text-primary text-xl"
+            >My {{ currentPaymentSummaryOption }} Sales
           </UiCardTitle>
 
           <UiSelect name="paymentStatus" v-model="currentPaymentSummaryOption">
-            <UiSelectTrigger class="h-8 w-[100px] z-10 border border-muted-foreground/30">
+            <UiSelectTrigger
+              class="h-8 w-[100px] z-10 border border-muted-foreground/30"
+            >
               <UiSelectValue :placeholder="`${currentPaymentSummaryOption}`" />
             </UiSelectTrigger>
             <UiSelectContent side="bottom">
-              <UiSelectItem v-for="option in paymentSummaryOptions" :key="option" :value="option">
+              <UiSelectItem
+                v-for="option in paymentSummaryOptions"
+                :key="option"
+                :value="option"
+              >
                 {{ option }}
               </UiSelectItem>
             </UiSelectContent>
           </UiSelect>
         </UiCardHeader>
-        <UiCardContent class="h-full flex justify-center flex-col gap-1 relative z-10">
-          <div class="flex items-center gap-6">
-            <p class="text-2xl font-bold">
-              {{
-                isLoading
-                  ? "Loading..."
-                  : `${totalTransactionAmount
-                    ? formatAvailableBalance(
-                      totalTransactionAmount.toFixed(2),
-                      showFullAvailableBalance,
-                      "balance"
-                    )
-                    : "----"
-                  } `
-              }}
-              {{ todaysTransactions?.[0]?.currencyCode }}
-            </p>
-            <Icons.hide v-if="showFullAvailableBalance" class="md:w-7 md:h-7 w-5 h-5 fill-muted-foreground" @click="
-              toggleAvailableBalanceVisibility('showFullAvailableBalance')
-              " />
-            <Icons.view v-else class="md:w-7 md:h-7 w-5 h-5 dark:fill-white" @click="
-              toggleAvailableBalanceVisibility('showFullAvailableBalance')
-              " />
+
+        <UiCardContent
+          class="h-full flex justify-center flex-col gap-1 relative z-10"
+        >
+          <!-- Internal Skeleton Loader for Stats -->
+          <div v-if="statsLoading" class="flex flex-col gap-4">
+            <div class="flex gap-4 items-center">
+              <UiSkeleton class="h-8 w-40 bg-slate-300/50" />
+              <UiSkeleton class="h-8 w-8 rounded-full bg-slate-300/50" />
+            </div>
+            <UiSkeleton class="h-6 w-60 bg-slate-300/50" />
+            <UiSkeleton class="h-4 w-32 bg-slate-300/50" />
           </div>
-          <p class="text-base text-[#CDA352]">
-            {{
-              isLoading
-                ? "Loading..."
-                : `Merchant AC - ${transactionData?.[0]?.merchantAccountNumber
-                  ? formatAvailableBalance(
-                    transactionData?.[0]?.merchantAccountNumber,
-                    showFullAvailableBalance,
-                    "merchantAccountNumber"
-                  )
-                  : "N/A"
+
+          <template v-else>
+            <div class="flex items-center gap-6">
+              <p class="text-2xl font-bold">
+                {{
+                  totalTransactionAmount
+                    ? formatAvailableBalance(
+                        totalTransactionAmount.toFixed(2),
+                        showFullAvailableBalance,
+                        "balance"
+                      )
+                    : "0.00"
+                }}
+                {{ statsTransactions?.[0]?.currencyCode || "ETB" }}
+              </p>
+              <Icons.hide
+                v-if="showFullAvailableBalance"
+                class="md:w-7 md:h-7 w-5 h-5 fill-muted-foreground"
+                @click="
+                  toggleAvailableBalanceVisibility('showFullAvailableBalance')
+                "
+              />
+              <Icons.view
+                v-else
+                class="md:w-7 md:h-7 w-5 h-5 dark:fill-white"
+                @click="
+                  toggleAvailableBalanceVisibility('showFullAvailableBalance')
+                "
+              />
+            </div>
+            <p class="text-base text-[#CDA352]">
+              {{
+                `Merchant AC - ${
+                  statsTransactions?.[0]?.merchantAccountNumber
+                    ? formatAvailableBalance(
+                        statsTransactions?.[0]?.merchantAccountNumber,
+                        showFullAvailableBalance,
+                        "merchantAccountNumber"
+                      )
+                    : "N/A"
                 }`
-            }}
-          </p>
-          <p class="text-sm text-muted-foreground">
-            {{ new Date().toLocaleString() }}
-          </p>
+              }}
+            </p>
+            <p class="text-sm text-muted-foreground">
+              {{ new Date().toLocaleString() }}
+            </p>
+          </template>
         </UiCardContent>
         <div class="bg-primary w-full mt-auto rounded-b-3xl p-6">
           <p class="text-lg text-primary-foreground">
@@ -239,9 +272,13 @@ watch(
         </div>
       </UiCard>
 
-      <!-- Initiate payment -->
-      <UiPermissionGuard :permission="PermissionConstants.INIT_MERCHANT_TRANSACTION">
-        <UiCard class="col-span-1 lg:col-span-3  max-h-min min-h-64 xl:col-span-4  p-6 space-y-4 w-full">
+      <!-- Initiate Payment (Always Visible) -->
+      <UiPermissionGuard
+        :permission="PermissionConstants.INIT_MERCHANT_TRANSACTION"
+      >
+        <UiCard
+          class="col-span-1 lg:col-span-3 max-h-min min-h-64 xl:col-span-4 p-6 space-y-4 w-full"
+        >
           <h1 class="font-semibold text-xl col-span-full flex-1 w-full block">
             Initiate Payment
           </h1>
@@ -250,22 +287,26 @@ watch(
       </UiPermissionGuard>
     </div>
 
-    <div class="grid gap-4 md:gap-8 max-h-[400px] grid-cols-1 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-9">
+    <div
+      class="grid gap-4 md:gap-8 max-h-[400px] grid-cols-1 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-9"
+    >
       <!-- Account Overview -->
-      <!-- <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION"> -->
-      <UiCard class="col-span-1 lg:col-span-4 max-h-[450px] xl:col-span-5 shadow-md rounded-xl">
+      <UiCard
+        class="col-span-1 lg:col-span-4 max-h-[450px] xl:col-span-5 shadow-md rounded-xl"
+      >
         <UiCardHeader>
           <UiCardTitle>Overview</UiCardTitle>
         </UiCardHeader>
         <UiCardContent class="pl-2">
-          <DashboardOverview :transactionData="transactionData" />
+          <!-- Uses statsTransactions (Yearly data) so chart is always populated -->
+          <DashboardOverview :transactionData="statsTransactions" />
         </UiCardContent>
       </UiCard>
-      <!-- </UiPermissionGuard> -->
 
-      <!-- <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION"> -->
       <!-- Recent Transactions -->
-      <UiCard class="col-span-1 lg:col-span-3 max-h-[450px] xl:col-span-4 shadow-md rounded-xl">
+      <UiCard
+        class="col-span-1 lg:col-span-3 max-h-[450px] xl:col-span-4 shadow-md rounded-xl"
+      >
         <UiCardHeader>
           <div class="flex justify-between w-full items-center">
             <div class="space-y-1">
@@ -280,10 +321,16 @@ watch(
           </div>
         </UiCardHeader>
         <UiCardContent>
-          <DashboardRecentSales :transactionData="allTransactions" />
+          <div v-if="recentLoading" class="space-y-2">
+            <UiSkeleton class="h-12 w-full" />
+            <UiSkeleton class="h-12 w-full" />
+            <UiSkeleton class="h-12 w-full" />
+            <UiSkeleton class="h-12 w-full" />
+          </div>
+          <DashboardRecentSales v-else :transactionData="recentTransactions" />
         </UiCardContent>
       </UiCard>
-      <!-- </UiPermissionGuard> -->
     </div>
   </div>
 </template>
+```

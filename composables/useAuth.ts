@@ -55,9 +55,9 @@ export const useAuth = () => {
         // if(profileResponse){
           store.setProfile(data.value?.operatorDTO)
         // }    
-        if(data.value?.operatorDTO?.merchantOperatorId){
-          const authoritiesResponse =  await getAuthorities(data.value?.operatorDTO?.merchantOperatorId); 
-        } 
+        // if(data.value?.operatorDTO?.merchantOperatorId){
+        //   const authoritiesResponse =  await getAuthorities(data.value?.operatorDTO?.merchantOperatorId); 
+        // } 
     
         // if(authoritiesResponse){
         //   store.setProfile(profileResponse)
