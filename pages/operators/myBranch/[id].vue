@@ -16,18 +16,21 @@ import { getIdFromPath } from "~/lib/utils";
 import ErrorMessage from "~/components/ui/errorMessage/ErrorMessage.vue";
 const openItems = ref("operatorDetails");
 
-const { getMerchantOperatorById, updateMerchantOperator, getMerchantOperatorRoles } =
-  await useOperators();
-const { getBranches } = useBranches()
+const {
+  getMerchantOperatorById,
+  updateMerchantOperator,
+  getMerchantOperatorRoles,
+} = await useOperators();
+const { getBranches } = useBranches();
 
 definePageMeta({
-   hideBreadcrumb: true,
+  hideBreadcrumb: true,
 });
 
 const route = useRoute();
 const isError = ref(false);
 const isMerchantError = ref(false);
-const isRolesError  = ref(false);
+const isRolesError = ref(false);
 
 const loading = ref(false);
 const rolesLoading = ref(false);
@@ -40,7 +43,7 @@ const isSubmitting = ref(false);
 const activeTab = route.query.activeTab as string;
 openItems.value = activeTab || "operatorDetails";
 
-operatorId.value = getIdFromPath()
+operatorId.value = getIdFromPath();
 
 const form = useForm({
   validationSchema: updateMerchantOperatorFormSchema,
@@ -48,11 +51,9 @@ const form = useForm({
 
 const fetchOperatorData = async () => {
   try {
-    isError.value = false
+    isError.value = false;
     loading.value = true;
-    data.value = await getMerchantOperatorById(
-      operatorId.value
-    );
+    data.value = await getMerchantOperatorById(operatorId.value);
 
     if (data.value) {
       form.setValues({
@@ -69,11 +70,11 @@ const fetchOperatorData = async () => {
 
 const fetchOperatorRolesData = async () => {
   try {
-    isRolesError.value = false
+    isRolesError.value = false;
     rolesLoading.value = true;
     const response = await getMerchantOperatorRoles();
-    merchantRolesData.value = response
-    console.log(merchantRolesData.value)
+    merchantRolesData.value = response;
+    console.log(merchantRolesData.value);
   } catch (err) {
     console.error("Error fetching operator", err);
     isRolesError.value = true;
@@ -82,15 +83,12 @@ const fetchOperatorRolesData = async () => {
   }
 };
 
-
 const fetchMerchantsData = async () => {
   try {
-    isMerchantError.value = false
+    isMerchantError.value = false;
     merchantLoading.value = true;
-    const response = await getBranches(
-      0, 1000
-    )
-    branchesData.value = response
+    const response = await getBranches(0, 1000);
+    branchesData.value = response;
   } catch (err) {
     console.error("Error fetching branches", err);
     isMerchantError.value = true;
@@ -100,16 +98,16 @@ const fetchMerchantsData = async () => {
 };
 
 onMounted(async () => {
-  isError.value = false
-  await fetchMerchantsData()
-  await fetchOperatorRolesData()
+  isError.value = false;
+  await fetchMerchantsData();
+  await fetchOperatorRolesData();
   await fetchOperatorData();
 });
 
 const refetch = async () => {
-  isError.value = false
-  await fetchMerchantsData()
-  await fetchOperatorRolesData()
+  isError.value = false;
+  await fetchMerchantsData();
+  await fetchOperatorRolesData();
   await fetchOperatorData();
 };
 
@@ -121,10 +119,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
       ...data.value,
       ...values,
     };
-    data.value = await updateMerchantOperator(
-      operatorId.value,
-      updatedData
-    );
+    data.value = await updateMerchantOperator(operatorId.value, updatedData);
     form.setValues({
       ...data.value,
     });
@@ -145,7 +140,9 @@ const onSubmit = form.handleSubmit(async (values: any) => {
 watch(
   () => route.query.activeTab,
   (newActiveTab) => {
-    refetch();
+    if (newActiveTab == "operatorDetails") {
+      refetch();
+    }
     if (newActiveTab) {
       openItems.value = newActiveTab as string; // Update the active tab when the query param
     }
@@ -156,60 +153,91 @@ watch(
 <template>
   <div class="w-full flex flex-col gap-8">
     <UiTabs v-model="openItems" class="w-full space-y-2">
-      <UiTabsList class="w-full h-full overflow-x-scroll flex justify-start gap-2 p-2 bg-card">
-        <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR">
-          <UiTabsTrigger value="operatorDetails" @click="
-            navigateTo({
-              path: route.path,
-              query: {
-                activeTab: 'operatorDetails',
-              },
-            })
+      <UiTabsList
+        class="w-full h-full overflow-x-scroll flex justify-start gap-2 p-2 bg-card"
+      >
+        <UiPermissionGuard
+          :permission="PermissionConstants.READ_MERCHANT_OPERATOR"
+        >
+          <UiTabsTrigger
+            value="operatorDetails"
+            @click="
+              navigateTo({
+                path: route.path,
+                query: {
+                  activeTab: 'operatorDetails',
+                },
+              })
             "
-            class="text-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border  rounded-t-lg rounded-b-none">
+            class="text-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border rounded-t-lg rounded-b-none"
+          >
             Operator Details
           </UiTabsTrigger>
         </UiPermissionGuard>
-        <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION">
-          <UiTabsTrigger value="operatorTransactions" @click="
-            navigateTo({
-              path: route.path,
-              query: {
-                activeTab: 'operatorTransactions',
-              },
-            })
+        <UiPermissionGuard
+          :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION"
+        >
+          <UiTabsTrigger
+            value="operatorTransactions"
+            @click="
+              navigateTo({
+                path: route.path,
+                query: {
+                  activeTab: 'operatorTransactions',
+                },
+              })
             "
-            class="text-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border  rounded-t-lg rounded-b-none">
+            class="text-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border rounded-t-lg rounded-b-none"
+          >
             Operator Transactions
           </UiTabsTrigger>
-          <UiTabsTrigger value="transactionDetails" @click="
-            navigateTo({
-              path: route.path,
-              query: {
-                activeTab: 'transactionDetails',
-              },
-            })
+          <UiTabsTrigger
+            value="transactionDetails"
+            @click="
+              navigateTo({
+                path: route.path,
+                query: {
+                  activeTab: 'transactionDetails',
+                },
+              })
             "
             :disabled="openItems != 'transactionDetails'"
-            class="text-lg data-[state=active]:bg-primary  data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border  rounded-t-lg rounded-b-none data-[state=inactive]:hidden">
+            class="text-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=inactive]:bg-muted data-[state=inactive]:text-muted-foreground border rounded-t-lg rounded-b-none data-[state=inactive]:hidden"
+          >
             Transactions Details
           </UiTabsTrigger>
         </UiPermissionGuard>
       </UiTabsList>
-      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR">
-        <UiTabsContent  value="operatorDetails" class="text-base bg-background p-6 rounded-lg border">
+      <UiPermissionGuard
+        :permission="PermissionConstants.READ_MERCHANT_OPERATOR"
+      >
+        <UiTabsContent
+          value="operatorDetails"
+          class="text-base bg-background p-6 rounded-lg border"
+        >
           <div v-if="loading" class="py-10 flex justify-center items-center">
-      <UiLoading />
-    </div>
-          <UiCard v-if="data && !isError && !loading"  class="w-full flex border-[1px] rounded-lg h-full">
+            <UiLoading />
+          </div>
+          <UiCard
+            v-if="data && !isError && !loading"
+            class="w-full flex border-[1px] rounded-lg h-full"
+          >
             <div class="text-sm md:text-base p-6 basis-full">
               <form @submit="onSubmit">
                 <div class="grid grid-cols-2 gap-6">
-                  <FormField v-slot="{ componentField }" name="merchantOperatorId">
+                  <FormField
+                    v-slot="{ componentField }"
+                    name="merchantOperatorId"
+                  >
                     <FormItem>
                       <FormLabel>Operator Id </FormLabel>
                       <FormControl>
-                        <UiInput type="text" disabled placeholder="Enter Operator Id	" v-bind="componentField" />
+                        <UiInput
+                          type="text"
+                          disabled
+                          placeholder="Enter Operator Id	"
+                          v-bind="componentField"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -218,7 +246,11 @@ watch(
                     <FormItem class="w-full">
                       <FormLabel> First Name </FormLabel>
                       <FormControl>
-                        <UiInput type="text" placeholder="Enter first name" v-bind="componentField" />
+                        <UiInput
+                          type="text"
+                          placeholder="Enter first name"
+                          v-bind="componentField"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -227,7 +259,11 @@ watch(
                     <FormItem class="w-full">
                       <FormLabel> Middle Name </FormLabel>
                       <FormControl>
-                        <UiInput type="text" placeholder="Enter middle name" v-bind="componentField" />
+                        <UiInput
+                          type="text"
+                          placeholder="Enter middle name"
+                          v-bind="componentField"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -236,7 +272,11 @@ watch(
                     <FormItem class="w-full">
                       <FormLabel> Last Name </FormLabel>
                       <FormControl>
-                        <UiInput type="text" placeholder="Enter last name" v-bind="componentField" />
+                        <UiInput
+                          type="text"
+                          placeholder="Enter last name"
+                          v-bind="componentField"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -246,17 +286,27 @@ watch(
                     <FormItem class="w-full">
                       <FormLabel>Operator Code</FormLabel>
                       <FormControl>
-                        <UiInput type="text" disabled placeholder="Enter operator code" v-bind="componentField" />
+                        <UiInput
+                          type="text"
+                          disabled
+                          placeholder="Enter operator code"
+                          v-bind="componentField"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   </FormField>
 
                   <FormField v-slot="{ value, handleChange }" name="active">
-                    <FormItem class="flex flex-row items-center justify-between rounded-lg border p-4 w-full">
+                    <FormItem
+                      class="flex flex-row items-center justify-between rounded-lg border p-4 w-full"
+                    >
                       <FormLabel class="text-base"> Is Active</FormLabel>
                       <FormControl>
-                        <UiSwitch :checked="value" @update:checked="handleChange" />
+                        <UiSwitch
+                          :checked="value"
+                          @update:checked="handleChange"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -268,12 +318,17 @@ watch(
                       <UiSelect v-bind="componentField">
                         <FormControl>
                           <UiSelectTrigger>
-                            <UiSelectValue placeholder="Select an operator Role" />
+                            <UiSelectValue
+                              placeholder="Select an operator Role"
+                            />
                           </UiSelectTrigger>
                         </FormControl>
                         <UiSelectContent>
                           <UiSelectGroup>
-                            <UiSelectItem v-for="item in merchantRolesData" :value="item.name">
+                            <UiSelectItem
+                              v-for="item in merchantRolesData"
+                              :value="item.name"
+                            >
                               {{ item.name }}
                             </UiSelectItem>
                           </UiSelectGroup>
@@ -283,18 +338,26 @@ watch(
                     </FormItem>
                   </FormField>
 
-                  <FormField v-slot="{ componentField }" name="merchantBranchId">
+                  <FormField
+                    v-slot="{ componentField }"
+                    name="merchantBranchId"
+                  >
                     <FormItem class="w-full">
                       <FormLabel>Merchant Branch </FormLabel>
                       <UiSelect v-bind="componentField">
                         <FormControl>
                           <UiSelectTrigger>
-                            <UiSelectValue placeholder="Select a merchant branch	" />
+                            <UiSelectValue
+                              placeholder="Select a merchant branch	"
+                            />
                           </UiSelectTrigger>
                         </FormControl>
                         <UiSelectContent>
                           <UiSelectGroup v-if="branchesData.length > 0">
-                            <UiSelectItem v-for="item in branchesData" :value="item.merchantBranchId">
+                            <UiSelectItem
+                              v-for="item in branchesData"
+                              :value="item.merchantBranchId"
+                            >
                               {{ item.branchName }}
                             </UiSelectItem>
                           </UiSelectGroup>
@@ -309,13 +372,24 @@ watch(
                     </FormItem>
                   </FormField>
 
-                  <UiPermissionGuard :permission="PermissionConstants.UPDATE_MERCHANT_OPERATOR">
+                  <UiPermissionGuard
+                    :permission="PermissionConstants.UPDATE_MERCHANT_OPERATOR"
+                  >
                     <div class="col-span-full w-full py-4 flex justify-between">
-                      <UiButton :disabled="isSubmitting" variant="outline" type="button" @click="$router.go(-1)">
+                      <UiButton
+                        :disabled="isSubmitting"
+                        variant="outline"
+                        type="button"
+                        @click="$router.go(-1)"
+                      >
                         Cancel
                       </UiButton>
                       <UiButton :disabled="isSubmitting" type="submit">
-                        <Icon name="svg-spinners:8-dots-rotate" v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin">
+                        <Icon
+                          name="svg-spinners:8-dots-rotate"
+                          v-if="isSubmitting"
+                          class="mr-2 h-4 w-4 animate-spin"
+                        >
                         </Icon>
 
                         Update
@@ -326,17 +400,24 @@ watch(
               </form>
             </div>
           </UiCard>
-              <div v-else-if="(isError && !loading)">
-      <ErrorMessage :retry="refetch" title="Something went wrong." />
-    </div>
+          <div v-else-if="isError && !loading">
+            <ErrorMessage :retry="refetch" title="Something went wrong." />
+          </div>
         </UiTabsContent>
-    
       </UiPermissionGuard>
-      <UiPermissionGuard :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION">
-        <UiTabsContent value="operatorTransactions" class="text-base bg-background border p-6 h-full rounded-lg">
+      <UiPermissionGuard
+        :permission="PermissionConstants.READ_MERCHANT_OPERATOR_TRANSACTION"
+      >
+        <UiTabsContent
+          value="operatorTransactions"
+          class="text-base bg-background border p-6 h-full rounded-lg"
+        >
           <OperatorsTransactions />
         </UiTabsContent>
-        <UiTabsContent value="transactionDetails" class="text-base bg-background border p-6 h-full rounded-lg">
+        <UiTabsContent
+          value="transactionDetails"
+          class="text-base bg-background border p-6 h-full rounded-lg"
+        >
           <OperatorsTransactionsDetails />
         </UiTabsContent>
       </UiPermissionGuard>

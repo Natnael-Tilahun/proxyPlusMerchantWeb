@@ -2,58 +2,39 @@
 import { ref, computed } from "vue";
 import { columns } from "~/components/operators/transactions/columns";
 import { useTransactions } from "~/composables/useTransactions";
-import { useRouter } from "vue-router"; // {{ edit_1 }}
+import { useRouter } from "vue-router";
 import type { Transaction } from "~/types";
 import { getIdFromPath } from "~/lib/utils";
+import ServerPagination from "~/components/ui/ServerPagination.vue";
 
-const { getTransactionsByOperatorId } = useTransactions({ autoFetch: false });
-const data = ref<Transaction[]>([]);
-const isLoading = ref(true);
-const isError = ref(false);
-const router = useRouter(); // {{ edit_2 }}
-const transactionFilterStore = useTransactionFilterStore();
-const operatorId = ref<string>("");
-operatorId.value = getIdFromPath();
-const route = useRoute();
+const operatorId = getIdFromPath();
 
-try {
-  const response = await getTransactionsByOperatorId(operatorId.value);
-  data.value = response
-    ?.slice()
-    ?.sort(
-      (a, b) =>
-        new Date(b.expirationDate).getTime() -
-        new Date(a.expirationDate).getTime()
-    );
-} catch (error) {
-  console.error("Error fetching transactions:", error);
-  isError.value = true;
-} finally {
-  isLoading.value = false;
-}
+// Use the main hook with operator mode
+const {
+  transactions: data,
+  total,
+  page,
+  size,
+  loading: isLoading,
+  error: isError,
+  fetchTransactions: refetch, // Renaming for compatibility if needed, or use directly
+  onPageChange,
+  onSizeChange,
+} = useTransactions({
+  mode: "operator",
+  operatorId: operatorId,
+  autoFetch: true, // Auto fetch on mount
+  ignoreStore: false, // Keep using global filters as per previous behavior
+});
 
-const refetch = async () => {
-  try {
-    isLoading.value = true;
-    const response = await getTransactionsByOperatorId(operatorId.value);
-    data.value = response
-      ?.slice()
-      ?.sort(
-        (a, b) =>
-          new Date(a.expirationDate).getTime() -
-          new Date(b.expirationDate).getTime()
-      );
-  } catch (error) {
-    console.error("Error fetching transactions:", error);
-    isError.value = true;
-  } finally {
-    isLoading.value = false;
-  }
-};
+const router = useRouter();
+
+// Provide the refetch function if needed by columns or children
+// The previous code didn't provide it, but passed it to Filterbar
 
 const navigateToPrintTransactions = () => {
   router.push({
-    path: `/operators/${operatorId.value}`,
+    path: `/operators/${operatorId}`,
     query: {
       activeTab: "downloadTransactions",
     },
@@ -87,11 +68,20 @@ const navigateToPrintTransactions = () => {
     </div>
 
     <UiCard v-else-if="data && !isError" class="p-6">
-      <UiDataTable :columns="columns" :data="data">
+      <UiDataTable :columns="columns" :data="data || []">
         <template v-slot:toolbar="{ table }">
           <TransactionsDataTableFilterbar :refetch="refetch" :table="table" />
         </template>
       </UiDataTable>
+      <div class="py-4">
+        <ServerPagination
+          :page="page"
+          :size="size"
+          :total="total"
+          :on-page-change="onPageChange"
+          :on-size-change="onSizeChange"
+        />
+      </div>
     </UiCard>
 
     <div v-else-if="isError || data == null || data == undefined">

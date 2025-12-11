@@ -1,14 +1,28 @@
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { useApi } from "./useApi";
 import type { Operator, OperatorRole } from "~/types";
 import type { ApiResult } from "~/types/api";
 import { handleApiError } from "~/types/api";
 import { usePagination } from "./usePagination";
 
-export const useOperators = () => {
+// Update export to accept options
+export const useOperators = (options: {
+  mode?: "all" | "branch";
+  branchId?: string;
+  autoFetch?: boolean; // Add autoFetch here to control immediate fetch
+} = {}) => {
+  const { mode = "all", autoFetch = false } = options; // Default autoFetch false to match previous behavior if not specified
   const isLoading = ref<boolean>(false);
   const isSubmitting = ref<boolean>(false);
   const { fetch } = useApi();
+
+  // Determine endpoint based on mode
+  const endpoint = computed(() => {
+    if (mode === "branch" && options.branchId) {
+      return `/api/v1/merchants2/operators/by-branch/${options.branchId}`;
+    }
+    return "/api/v1/merchants2/operators";
+  });
 
   // --- Pagination & State for Main List ---
   const {
@@ -24,10 +38,10 @@ export const useOperators = () => {
     filters,
     onFiltersChange
   } = usePagination<Operator>({
-    endpoint: "/api/v1/merchants2/operators",
+    endpoint: endpoint,
     sortValue: "firstName,ASC",
     options: {
-      autoFetch: false // Let the page component trigger it to avoid hydration mismatches or double fetches if intended
+      autoFetch: false // We control fetch via watcher or manual call
     }
   });
 
@@ -35,6 +49,11 @@ export const useOperators = () => {
   watch([page, size], async () => {
     await fetchOperators();
   });
+  
+  // Watch endpoint changes if in branch mode to refetch when ID changes
+  watch(endpoint, async () => {
+      await fetchOperators();
+  }, { immediate: autoFetch }); // Fetch immediately if autoFetch is true
 
   // Keep compatibility for manual calls if needed, though mostly replaced by fetchOperators
   const getMerchantOperators = async (p?: number, s?: number) => {

@@ -16,9 +16,12 @@ import { getIdFromPath } from "~/lib/utils";
 import ErrorMessage from "~/components/ui/errorMessage/ErrorMessage.vue";
 const openItems = ref("operatorDetails");
 
-const { getMerchantOperatorById, updateMerchantOperator, getMerchantOperatorRoles } =
-  await useOperators();
-const { getBranches } = useBranches()
+const {
+  getMerchantOperatorById,
+  updateMerchantOperator,
+  getMerchantOperatorRoles,
+} = await useOperators({ autoFetch: false });
+const { getBranches } = useBranches({ autoFetch: false });
 
 definePageMeta({
   hideBreadcrumb: true,
@@ -40,7 +43,7 @@ const isSubmitting = ref(false);
 const activeTab = route.query.activeTab as string;
 openItems.value = activeTab || "operatorDetails";
 
-operatorId.value = route.query.operatorId as string
+operatorId.value = route.query.operatorId as string;
 
 const form = useForm({
   validationSchema: updateMerchantOperatorFormSchema,
@@ -48,11 +51,9 @@ const form = useForm({
 
 const fetchOperatorData = async () => {
   try {
-    isError.value = false
+    isError.value = false;
     loading.value = true;
-    data.value = await getMerchantOperatorById(
-      operatorId.value
-    );
+    data.value = await getMerchantOperatorById(operatorId.value);
 
     if (data.value) {
       form.setValues({
@@ -69,11 +70,11 @@ const fetchOperatorData = async () => {
 
 const fetchOperatorRolesData = async () => {
   try {
-    isRolesError.value = false
+    isRolesError.value = false;
     rolesLoading.value = true;
     const response = await getMerchantOperatorRoles();
-    merchantRolesData.value = response
-    console.log(merchantRolesData.value)
+    merchantRolesData.value = response;
+    console.log(merchantRolesData.value);
   } catch (err) {
     console.error("Error fetching operator", err);
     isRolesError.value = true;
@@ -82,15 +83,12 @@ const fetchOperatorRolesData = async () => {
   }
 };
 
-
 const fetchMerchantsData = async () => {
   try {
-    isMerchantError.value = false
+    isMerchantError.value = false;
     merchantLoading.value = true;
-    const response = await getBranches(
-      0, 1000
-    )
-    branchesData.value = response
+    const response = await getBranches(0, 1000);
+    branchesData.value = response;
   } catch (err) {
     console.error("Error fetching branches", err);
     isMerchantError.value = true;
@@ -100,16 +98,16 @@ const fetchMerchantsData = async () => {
 };
 
 onMounted(async () => {
-  isError.value = false
-  await fetchMerchantsData()
-  await fetchOperatorRolesData()
+  isError.value = false;
+  await fetchMerchantsData();
+  await fetchOperatorRolesData();
   await fetchOperatorData();
 });
 
 const refetch = async () => {
-  isError.value = false
-  await fetchMerchantsData()
-  await fetchOperatorRolesData()
+  isError.value = false;
+  await fetchMerchantsData();
+  await fetchOperatorRolesData();
   await fetchOperatorData();
 };
 
@@ -121,10 +119,7 @@ const onSubmit = form.handleSubmit(async (values: any) => {
       ...data.value,
       ...values,
     };
-    data.value = await updateMerchantOperator(
-      operatorId.value,
-      updatedData
-    );
+    data.value = await updateMerchantOperator(operatorId.value, updatedData);
     form.setValues({
       ...data.value,
     });
@@ -159,7 +154,10 @@ watch(
       <div v-if="loading" class="py-10 flex justify-center items-center">
         <UiLoading />
       </div>
-      <UiCard v-if="data && !isError && !loading" class="w-full flex border-[1px] rounded-lg h-full">
+      <UiCard
+        v-if="data && !isError && !loading"
+        class="w-full flex border-[1px] rounded-lg h-full"
+      >
         <div class="text-sm md:text-base p-6 basis-full">
           <form @submit="onSubmit">
             <div class="grid grid-cols-2 gap-6">
@@ -167,7 +165,12 @@ watch(
                 <FormItem>
                   <FormLabel>Operator Id </FormLabel>
                   <FormControl>
-                    <UiInput type="text" disabled placeholder="Enter Operator Id	" v-bind="componentField" />
+                    <UiInput
+                      type="text"
+                      disabled
+                      placeholder="Enter Operator Id	"
+                      v-bind="componentField"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -176,7 +179,11 @@ watch(
                 <FormItem class="w-full">
                   <FormLabel> First Name </FormLabel>
                   <FormControl>
-                    <UiInput type="text" placeholder="Enter first name" v-bind="componentField" />
+                    <UiInput
+                      type="text"
+                      placeholder="Enter first name"
+                      v-bind="componentField"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -185,7 +192,11 @@ watch(
                 <FormItem class="w-full">
                   <FormLabel> Middle Name </FormLabel>
                   <FormControl>
-                    <UiInput type="text" placeholder="Enter middle name" v-bind="componentField" />
+                    <UiInput
+                      type="text"
+                      placeholder="Enter middle name"
+                      v-bind="componentField"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -194,7 +205,11 @@ watch(
                 <FormItem class="w-full">
                   <FormLabel> Last Name </FormLabel>
                   <FormControl>
-                    <UiInput type="text" placeholder="Enter last name" v-bind="componentField" />
+                    <UiInput
+                      type="text"
+                      placeholder="Enter last name"
+                      v-bind="componentField"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -204,14 +219,21 @@ watch(
                 <FormItem class="w-full">
                   <FormLabel>Operator Code</FormLabel>
                   <FormControl>
-                    <UiInput type="text" disabled placeholder="Enter operator code" v-bind="componentField" />
+                    <UiInput
+                      type="text"
+                      disabled
+                      placeholder="Enter operator code"
+                      v-bind="componentField"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               </FormField>
 
               <FormField v-slot="{ value, handleChange }" name="active">
-                <FormItem class="flex flex-row items-center justify-between rounded-lg border p-4 w-full">
+                <FormItem
+                  class="flex flex-row items-center justify-between rounded-lg border p-4 w-full"
+                >
                   <FormLabel class="text-base"> Is Active</FormLabel>
                   <FormControl>
                     <UiSwitch :checked="value" @update:checked="handleChange" />
@@ -230,7 +252,10 @@ watch(
                     </FormControl>
                     <UiSelectContent>
                       <UiSelectGroup>
-                        <UiSelectItem v-for="item in merchantRolesData" :value="item.name">
+                        <UiSelectItem
+                          v-for="item in merchantRolesData"
+                          :value="item.name"
+                        >
                           {{ item.name }}
                         </UiSelectItem>
                       </UiSelectGroup>
@@ -251,7 +276,10 @@ watch(
                     </FormControl>
                     <UiSelectContent>
                       <UiSelectGroup v-if="branchesData.length > 0">
-                        <UiSelectItem v-for="item in branchesData" :value="item.merchantBranchId">
+                        <UiSelectItem
+                          v-for="item in branchesData"
+                          :value="item.merchantBranchId"
+                        >
                           {{ item.branchName }}
                         </UiSelectItem>
                       </UiSelectGroup>
@@ -266,13 +294,24 @@ watch(
                 </FormItem>
               </FormField>
 
-              <UiPermissionGuard :permission="PermissionConstants.UPDATE_MERCHANT_OPERATOR">
+              <UiPermissionGuard
+                :permission="PermissionConstants.UPDATE_MERCHANT_OPERATOR"
+              >
                 <div class="col-span-full w-full py-4 flex justify-between">
-                  <UiButton :disabled="isSubmitting" variant="outline" type="button" @click="$router.go(-1)">
+                  <UiButton
+                    :disabled="isSubmitting"
+                    variant="outline"
+                    type="button"
+                    @click="$router.go(-1)"
+                  >
                     Cancel
                   </UiButton>
                   <UiButton :disabled="isSubmitting" type="submit">
-                    <Icon name="svg-spinners:8-dots-rotate" v-if="isSubmitting" class="mr-2 h-4 w-4 animate-spin">
+                    <Icon
+                      name="svg-spinners:8-dots-rotate"
+                      v-if="isSubmitting"
+                      class="mr-2 h-4 w-4 animate-spin"
+                    >
                     </Icon>
 
                     Update
@@ -283,10 +322,9 @@ watch(
           </form>
         </div>
       </UiCard>
-      <div v-else-if="(isError && !loading)">
+      <div v-else-if="isError && !loading">
         <ErrorMessage :retry="refetch" title="Something went wrong." />
       </div>
-
     </UiPermissionGuard>
   </div>
 </template>
