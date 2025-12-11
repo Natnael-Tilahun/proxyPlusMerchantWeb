@@ -8,7 +8,6 @@ import type {
 import {
   FlexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   useVueTable,
   getSortedRowModel,
   getFilteredRowModel,
@@ -32,7 +31,6 @@ const table = useVueTable({
   data: props.data,
   columns: props.columns,
   getCoreRowModel: getCoreRowModel(),
-  getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
   onSortingChange: (updaterOrValue) => valueUpdater(updaterOrValue, sorting),
   onColumnFiltersChange: (updaterOrValue) =>

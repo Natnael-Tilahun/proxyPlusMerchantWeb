@@ -4,46 +4,38 @@ import { columns } from "~/components/myTransactions/columns";
 import { useTransactions } from "~/composables/useTransactions";
 import { useRouter } from "vue-router"; // {{ edit_1 }}
 import type { Transaction } from "~/types";
+import ServerPagination from "~/components/ui/ServerPagination.vue";
 
-const { getMyTransactions } = useTransactions();
-const data = ref<Transaction[]>([]);
-const isLoading = ref(true);
-const isError = ref(false);
 const router = useRouter(); // {{ edit_2 }}
-const transactionFilterStore = useTransactionFilterStore();
 
 definePageMeta({
-   hideBreadcrumb: true,
+  hideBreadcrumb: true,
 });
 
-try {
-  const response = await getMyTransactions(" ",
-    "0",
-    "1000000000",
-    "DESC");
-    data.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime());
-  } catch (error) {
-  console.error("Error fetching transactions:", error);
-  isError.value = true;
-} finally {
-  isLoading.value = false;
-}
+// try {
+//   const response = await getMyTransactions(" ",
+//     "0",
+//     "1000000000",
+//     "DESC");
+//     data.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime());
+//   } catch (error) {
+//   console.error("Error fetching transactions:", error);
+//   isError.value = true;
+// } finally {
+//   isLoading.value = false;
+// }
 
-const refetch = async () => {
-  try {
-    isLoading.value = true;
-    const response = await getMyTransactions(" ",
-    "0",
-    "1000000000",
-    "DESC");
-    data.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
-  } catch (error) {
-    console.error("Error fetching transactions:", error);
-    isError.value = true;
-  } finally {
-    isLoading.value = false;
-  }
-};
+const {
+  transactions: data,
+  total,
+  page,
+  size,
+  loading: isLoading,
+  error: isError,
+  fetchTransactions: refetch,
+  onPageChange,
+  onSizeChange,
+} = useTransactions({ mode: "mine" });
 
 const navigateToPrintTransactions = () => {
   router.push({
@@ -83,6 +75,15 @@ const navigateToPrintTransactions = () => {
           <TransactionsDataTableFilterbar :refetch="refetch" :table="table" />
         </template>
       </UiDataTable>
+      <div class="py-4">
+        <ServerPagination
+          :page="page"
+          :size="size"
+          :total="total"
+          :on-page-change="onPageChange"
+          :on-size-change="onSizeChange"
+        />
+      </div>
     </UiCard>
 
     <div v-else-if="isError">

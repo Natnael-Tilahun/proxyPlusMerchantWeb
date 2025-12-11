@@ -14,10 +14,10 @@ const showOtherFilteration = ref(false);
 const transactionFilterStore = useTransactionFilterStore();
 const { getBranches } = useBranches();
 const { getMerchantOperators } = useOperators();
-const branchesData = ref([]);
+const branchesData = useState<any[]>("branches", () => []);
 const isError = ref(false);
 const loading = ref(false);
-const operatorsData = ref([]);
+const operatorsData = useState<any[]>("operators", () => []);
 // const branchesStore = useBranchesStore();
 // const operatorsStore = useOperatorsStore();
 const paymentStatusOptions = computed(() => [
@@ -45,11 +45,12 @@ const clearFilter = () => {
 // );
 
 const fetchBranchesData = async () => {
+  if (branchesData.value.length > 0) return;
   try {
     isError.value = false;
     loading.value = true;
     const response = await getBranches(0, 1000000);
-    branchesData.value = response;
+    branchesData.value = response || [];
   } catch (err) {
     console.error("Error fetching branches", err);
     isError.value = true;
@@ -59,11 +60,12 @@ const fetchBranchesData = async () => {
 };
 
 const fetchOperatorsData = async () => {
+  if (operatorsData.value.length > 0) return;
   try {
     isError.value = false;
     loading.value = true;
     const response = await getMerchantOperators(0, 1000000);
-    operatorsData.value = response;
+    operatorsData.value = response || [];
   } catch (err) {
     console.error("Error fetching operators", err);
     isError.value = true;
@@ -72,13 +74,11 @@ const fetchOperatorsData = async () => {
   }
 };
 
-
 onMounted(async () => {
   transactionFilterStore.$reset();
   await fetchBranchesData();
   await fetchOperatorsData();
 });
-
 </script>
 
 <template>
@@ -275,7 +275,7 @@ onMounted(async () => {
             </UiSelectContent>
           </UiSelect>
         </div>
-        
+
         <div class="space-y-1">
           <label for="branch" class="text-sm">Branch</label>
           <UiSelect
