@@ -1,32 +1,50 @@
+import { ref, watch } from "vue";
 import { useApi } from "./useApi";
 import type { Operator, OperatorRole } from "~/types";
 import type { ApiResult } from "~/types/api";
 import { handleApiError } from "~/types/api";
+import { usePagination } from "./usePagination";
 
 export const useOperators = () => {
   const isLoading = ref<boolean>(false);
   const isSubmitting = ref<boolean>(false);
   const { fetch } = useApi();
 
-  const getMerchantOperators: (page?: number, size?: number) => ApiResult<Operator[]> = async ( page, size) => {
-    try {
-      const { data, pending, error, status } = await fetch<Operator[]>(
-        `/api/v1/merchants2/operators`,
-        {
-          params: { page, size }
-        }
-      );
-
-      isLoading.value = pending.value;
-
-      if (status.value === "error") {
-        handleApiError(error);
-      }
-
-      return data.value ? (data.value as unknown as Operator[]) : null;
-    } catch (err) {
-      throw err
+  // --- Pagination & State for Main List ---
+  const {
+    data: operators,
+    total,
+    page,
+    size,
+    loading,
+    error,
+    fetchData: fetchOperators,
+    onPageChange,
+    onSizeChange,
+    filters,
+    onFiltersChange
+  } = usePagination<Operator>({
+    endpoint: "/api/v1/merchants2/operators",
+    sortValue: "firstName,ASC",
+    options: {
+      autoFetch: false // Let the page component trigger it to avoid hydration mismatches or double fetches if intended
     }
+  });
+
+  // Watch for pagination changes to auto-refetch
+  watch([page, size], async () => {
+    await fetchOperators();
+  });
+
+  // Keep compatibility for manual calls if needed, though mostly replaced by fetchOperators
+  const getMerchantOperators = async (p?: number, s?: number) => {
+     if (p !== undefined) page.value = p + 1; 
+     if (s !== undefined) size.value = s; 
+     // Fetch will be triggered by watchers if values changed, but if they didn't change 
+     // (e.g. force refresh on same page), we might need manual fetch.
+     // However, for strict compatibility:
+     await fetchOperators();
+     return operators.value;
   };
 
   const getMerchantOperatorById: (id: string) => ApiResult<Operator> = async ( id) => {
@@ -213,6 +231,20 @@ export const useOperators = () => {
 
   return {
     isLoading,
+    // Pagination
+    operators,
+    total,
+    page,
+    size,
+    loading, // This replaces the local isLoading for the list
+    error,
+    fetchOperators,
+    onPageChange,
+    onSizeChange,
+    filters,
+    onFiltersChange,
+
+    // Legacy / Specific
     getMerchantOperators,
     getMerchantOperatorById,
     createNeweMerchantOperator,

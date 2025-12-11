@@ -6,7 +6,7 @@ import { useRouter } from "vue-router"; // {{ edit_1 }}
 import type { Transaction } from "~/types";
 import { getIdFromPath } from "~/lib/utils";
 
-const { getTransactionsByOperatorId } = useTransactions();
+const { getTransactionsByOperatorId } = useTransactions({ autoFetch: false });
 const data = ref<Transaction[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
@@ -18,7 +18,13 @@ const route = useRoute();
 
 try {
   const response = await getTransactionsByOperatorId(operatorId.value);
-    data.value = response?.slice()?.sort((a, b) => new Date(b.expirationDate).getTime() - new Date(a.expirationDate).getTime()) ;
+  data.value = response
+    ?.slice()
+    ?.sort(
+      (a, b) =>
+        new Date(b.expirationDate).getTime() -
+        new Date(a.expirationDate).getTime()
+    );
 } catch (error) {
   console.error("Error fetching transactions:", error);
   isError.value = true;
@@ -29,8 +35,14 @@ try {
 const refetch = async () => {
   try {
     isLoading.value = true;
-   const response = await getTransactionsByOperatorId(operatorId.value);
-    data.value = response?.slice()?.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
+    const response = await getTransactionsByOperatorId(operatorId.value);
+    data.value = response
+      ?.slice()
+      ?.sort(
+        (a, b) =>
+          new Date(a.expirationDate).getTime() -
+          new Date(b.expirationDate).getTime()
+      );
   } catch (error) {
     console.error("Error fetching transactions:", error);
     isError.value = true;
@@ -42,9 +54,9 @@ const refetch = async () => {
 const navigateToPrintTransactions = () => {
   router.push({
     path: `/operators/${operatorId.value}`,
-    query : {
-      activeTab: "downloadTransactions"
-    }
+    query: {
+      activeTab: "downloadTransactions",
+    },
   });
 };
 </script>
