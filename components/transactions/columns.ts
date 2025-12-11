@@ -4,6 +4,7 @@ import DataTableColumnHeaderVue from "~/components/ui/dataTable/ColumnHeader.vue
 import TransactionsDataTableRowActionsVue from "./DataTableRowActions.vue";
 import { NuxtLink } from "#components";
 import type { Transaction } from "~/types";
+import { Badge } from "~/components/ui/badge";
 
 export const columns: ColumnDef<Transaction>[] = [
   {
@@ -36,7 +37,7 @@ export const columns: ColumnDef<Transaction>[] = [
         {
           class:
             "font-medium text-primary w-fit whitespace-nowrap truncate hover:w-full",
-          to: merchantTransactionId ? `${route.path}/transactionDetails/${merchantTransactionId}` : route.path,
+          to: `/transactions/${merchantTransactionId}`
         },
         payerName || "View"
       ) 
@@ -65,7 +66,15 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "paymentStatus",
-    header: ({ column }) => h(DataTableColumnHeaderVue, { column, title: "paymentStatus" }),
+    header: ({ column }) =>
+      h(DataTableColumnHeaderVue, { column, title: "paymentStatus" }),
+    cell: ({ row }) => {
+      const paymentStatus = row.getValue("paymentStatus");
+      return h(Badge, {
+        class: paymentStatus === "COMPLETED" ? "bg-green-500" : paymentStatus === "PENDING" ? "bg-yellow-500" : "bg-red-500",
+        variant: "outline"
+      }, paymentStatus);
+    },
   },
   {
     accessorKey: "paymentReference",

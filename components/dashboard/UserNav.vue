@@ -1,5 +1,21 @@
 <script setup lang="ts">
 const { profile } = useAuthStore();
+const { logout } = useAuth();
+
+const logoutHandler = async () => {
+  logout().then((data) => {
+    console.log("User logged out successfully!");
+
+    // Get the session management functions from the plugin
+    const { $releaseSession, $notifyLogout } = useNuxtApp();
+
+    // Release the session
+    $releaseSession();
+
+    // Notify other tabs about the logout
+    $notifyLogout();
+  });
+};
 </script>
 
 <template>
@@ -51,6 +67,10 @@ const { profile } = useAuthStore();
             <UiDropdownMenuShortcut>⇧⌘P</UiDropdownMenuShortcut>
           </UiDropdownMenuItem>
         </NuxtLink>
+        <UiDropdownMenuSeparator />
+        <UiDropdownMenuItem @click="logoutHandler">
+          Logout
+        </UiDropdownMenuItem>
         <!-- <NuxtLink to="/settings">
           <UiDropdownMenuItem>
             Settings

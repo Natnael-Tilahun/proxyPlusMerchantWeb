@@ -6,11 +6,12 @@ import { format } from "date-fns";
 import { cn } from "~/lib/utils";
 import { Calendar as CalendarIcon } from "lucide-vue-next";
 import { Icons } from "~/components/icons";
+import type { Transaction } from "~/types";
 
 const transactionData = ref<Transaction[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
-const { getTransactions } = useTransactions();
+const { getAllTransactions } = useTransactions();
 const startDate = ref<Date>();
 const endDate = ref<Date>();
 const selectedAccount = ref<string>();
@@ -18,8 +19,18 @@ const selectedAccount = ref<string>();
 // Fetch transaction data based on the account ID or other parameters
 async function fetchTransactionData() {
   try {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setHours(0, 0, 0, 0);
     isLoading.value = true;
-    transactionData.value = await getTransactions();
+    const response = await getAllTransactions(" ", "0", "10000000", "DESC");
+    transactionData.value = response
+      ?.slice()
+      ?.sort(
+        (a, b) =>
+          new Date(b.expirationDate).getTime() -
+          new Date(a.expirationDate).getTime()
+      );
     selectedAccount.value = transactionData.value[0]?.merchantAccountNumber;
   } catch (error) {
     console.error("Error fetching transactions:", error);
@@ -137,7 +148,7 @@ function downloadStatement() {
       class="bg-[#FCFCFC] dark:bg-secondary md:space-y-2 w-full py-4 md:px-7 px-4 border rounded-md"
     >
       <div class="gap-2 justify-between grid grid-cols-1 md:grid-cols-3">
-        <img src="/cbe-logo.png" class="md:w-fit h-fit" alt="Logo" />
+        <img src="/logo1.png" class="md:w-fit h-fit" alt="Logo" />
         <div class="md:space-y-2 space-y-0 flex flex-col lg:items-center">
           <h1 class="lg:text-xl md:text-lg text-sm">
             Merchant <span> </span> Transaction <span> </span> Statement
@@ -146,11 +157,13 @@ function downloadStatement() {
             class="flex items-center text-primary text-xs md:text-sm lg:text-base gap-4 tracking-wider"
           >
             <p class="">
-              {{ startDate ? startDate?.toLocaleDateString() : "DD/MM/YYYY" }}
+              {{ startDate ? startDate?.toLocaleDateString() : "" }}
             </p>
-            <span class="text-accent-foreground">-</span>
+            <span class="text-accent-foreground">
+              {{ startDate ? "-" : "" }}</span
+            >
             <p class="">
-              {{ startDate ? endDate?.toLocaleDateString() : "DD/MM/YYYY" }}
+              {{ endDate ? endDate?.toLocaleDateString() : "" }}
             </p>
           </div>
         </div>
@@ -187,16 +200,17 @@ function downloadStatement() {
             <UiTableHead class="uppercase font-semibold text-xs md:text-sm"
               >Transaction ID</UiTableHead
             >
-            <UiTableHead class="uppercase font-semibold md:text-sm text-xs"
+            <UiTableHead
+              class="uppercase text-left font-semibold md:text-sm text-xs"
               >Payment Reference</UiTableHead
             >
             <UiTableHead
-              class="text-right uppercase font-semibold md:text-sm text-xs"
+              class="text-left uppercase font-semibold md:text-sm text-xs"
             >
               Transaction Initiator
             </UiTableHead>
             <UiTableHead
-              class="text-right uppercase font-semibold md:text-sm text-xs"
+              class="text-left uppercase font-semibold md:text-sm text-xs"
             >
               Amount
             </UiTableHead>
@@ -222,10 +236,10 @@ function downloadStatement() {
               </div>
             </UiTableCell>
             <UiTableCell>{{ transaction.paymentReference }}</UiTableCell>
-            <UiTableCell class="text-right">
+            <UiTableCell class="text-left">
               {{ transaction.transactionInitiator }}
             </UiTableCell>
-            <UiTableCell class="text-right">
+            <UiTableCell class="text-left">
               <p class="text-[#2DD683]">+ {{ transaction?.amount }}</p>
             </UiTableCell>
             <UiTableCell class="text-right">

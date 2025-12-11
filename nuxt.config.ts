@@ -21,7 +21,7 @@ export default defineNuxtConfig({
     public: {
       // Only expose non-sensitive configuration to client
       HOME_URL:
-        process.env.HOME_URL || "https://operators-site.vercel.app",
+        process.env.HOME_URL || "https://mbmerchantuat.cbe.com.et",
       persistedState: {
         storage: "cookies",
         debug: false,
@@ -44,12 +44,14 @@ export default defineNuxtConfig({
         __API_BASE_URL__: JSON.stringify(process.env.API_BASE_URL),
         __X_APP_ID__: JSON.stringify(process.env.X_APP_ID),
         __X_APP_VERSION__: JSON.stringify(process.env.X_APP_VERSION),
+        __STOMP_URL__: JSON.stringify(process.env.STOMP_URL),
+        __HOME_URL__:JSON.stringify(process.env.HOME_URL)
       },
     },
 
   app: {
     head: {
-      title: "Operators Site",
+      title: "Proxy+ Merchant Site",
       link: [],
     },
   },

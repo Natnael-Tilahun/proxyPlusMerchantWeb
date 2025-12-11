@@ -1,7 +1,7 @@
 <template>
   <NuxtScrollbar
     tag="aside"
-    class="md:bg-primary bg-white dark:bg-gray-800 flex z-40 flex-col text-sm py-4 md:text-secondary dark:text-gray-300 md:w-full overflow-hidden font-medium space-y-6"
+    class="md:bg-primary bg-white dark:bg-card flex z-40 flex-col text-sm py-4 md:text-secondary dark:text-gray-300 md:w-full overflow-hidden font-medium space-y-6"
   >
     <div class="flex w-full h-24 md:items-center justify-between px-3">
       <!-- <h1
@@ -10,8 +10,8 @@
         Project X
       </h1> -->
       <img
-        src="/cbe-logo2.jpeg"
-        class="lg:w-24 lg:h-24 w-14 h-14 shadow-sm shadow-purple-500 mx-auto rounded-full"
+        src="/logo1.png"
+        class="lg:w-24 lg:h-24 w-14 h-14 mx-auto rounded-full"
         alt="CBE Logo"
       />
 
@@ -32,10 +32,16 @@
 
     <hr class="md:border-secondary/30" />
 
-    <ul class="flex flex-col gap-4 pl-5">
+    <div v-if="loading" class="pl-5 flex flex-col gap-4">
+      <div v-for="i in 5" :key="i" class="flex gap-3 items-center px-2 py-3">
+        <UiSkeleton class="h-6 w-6 rounded-full" />
+        <UiSkeleton class="h-4 w-32 rounded" />
+      </div>
+    </div>
+    <ul v-else class="flex flex-col gap-4 pl-5">
       <template v-for="(link, index) in mainLinks" :key="index">
         <UiCollapsible
-          v-if="link.dropdown && link.dropdown.length > 0"
+          v-if="link.dropdown && hasVisibleDropdownItems(link)"
           class="w-full rounded-l-lg hover:bg-popover hover:text-secondary-foreground px-0 shadow-none group"
           type="single"
           v-model:open="isOpen[index]"
@@ -47,7 +53,9 @@
               :to="link.link"
               class="flex gap-3 items-center px-2 rounded-l-full w-full py-0 rounded- transition text-left"
             >
-              <span><Icon :name="link.icon" :size="link.size"></Icon></span>
+              <span>
+                <Icon :name="link.icon" :size="link.size"></Icon>
+              </span>
               <p class="mr-auto">{{ link.title }}</p>
 
               <Icon
@@ -62,31 +70,51 @@
             <ul
               class="dropdown-menu rounded-none flex flex-col gap-0 py-2 pl-7"
             >
-              <!-- <li> -->
-              <NuxtLink
+              <template
                 v-for="(item, dropdownIndex) in link.dropdown"
                 :key="dropdownIndex"
-                :to="item.link"
-                @click="closeMenuNav"
-                class="w-full border-l-2 hover:rounded-r-lg group-hover:border-primary hover:bg-accent px-4 py-3 rounded-none hover:text-primary"
               >
-                {{ item.title }}
-              </NuxtLink>
-              <!-- <UiSeparator class="mt-3 bg-zinc-300" /> -->
-              <!-- </li> -->
+                <UiPermissionGuard :permission="item?.permission">
+                  <NuxtLink
+                    :key="dropdownIndex"
+                    :to="item.link"
+                    @click="closeMenuNav"
+                    class="w-full border-l-2 my-1 hover:rounded-r-lg group-hover:border-primary hover:bg-accent px-4 py-3 rounded-none hover:text-primary"
+                    :class="{
+                      'bg-[#8C2A7C]/15 rounded-lg font-bold': isRouteActive(
+                        item.link
+                      ),
+                    }"
+                  >
+                    {{ item.title }}
+                  </NuxtLink>
+                </UiPermissionGuard>
+              </template>
             </ul>
           </UiCollapsibleContent>
         </UiCollapsible>
 
-        <NuxtLink
-          v-else
-          :to="link.link"
-          @click="closeMenuNav"
-          class="flex gap-3 py-3 rounded-l-full px-3 hover:bg-popover hover:text-primary transition"
+        <UiPermissionGuard
+          v-if="!link?.dropdown"
+          :permission="link?.permission"
         >
-          <span><Icon :name="link.icon" :size="link.size"></Icon></span>
-          <p>{{ link.title }}</p>
-        </NuxtLink>
+          <NuxtLink
+            v-if="!link.dropdown"
+            :to="link.link"
+            @click="closeMenuNav"
+            class="flex gap-3 py-3 rounded-l-full px-3 hover:bg-popover hover:text-primary transition"
+            :class="{
+              'text-primary-foreground bg-primaryd font-bold': isRouteActive(
+                link?.link ?? ''
+              ),
+            }"
+          >
+            <span>
+              <Icon :name="link.icon" :size="link.size"></Icon>
+            </span>
+            <p>{{ link.title }}</p>
+          </NuxtLink>
+        </UiPermissionGuard>
       </template>
     </ul>
     <div class="w-full flex absolute bottom-7 justify-center items-center">
@@ -112,38 +140,42 @@
           </g>
         </svg>
 
-        Logout</UiButton
-      >
+        Logout
+      </UiButton>
     </div>
   </NuxtScrollbar>
 </template>
 
 <script lang="ts" setup>
-interface Link {
-  title: string;
-  icon: any;
-  link: string;
-  size: string;
-  showDropdown: boolean;
-  dropdown?: any;
-}
-const mainLinks: Link[] = [
-  {
-    title: "Dashboard",
-    icon: "ri:home-8-line",
-    link: "/",
-    size: "22",
-    showDropdown: false,
-  },
-  {
-    title: "Transactions",
-    icon: "uil:transaction",
-    link: "/transactions",
-    size: "22",
-    showDropdown: false,
-  },
-];
+import { mainLinks as allMainLinks } from "~/constants/mainLinks";
+import type { MenuItem } from "~/types";
 const { logout } = useAuth();
+const authStore = useAuthStore();
+const route = useRoute();
+
+const mainLinks = computed(() => {
+  const isForAllBranch = authStore.role?.effectiveToAllBranch;
+  const store = useAuthStore();
+  const myBranchId = store.profile?.merchantBranch?.merchantBranchId;
+
+  return allMainLinks.map((link) => {
+    if (link.dropdown) {
+      const newLink = { ...link };
+      newLink.dropdown = newLink.dropdown.filter((item) => {
+        const itemAny = item as any;
+        if (itemAny.effectiveToAllBranch && !isForAllBranch) {
+          return false;
+        }
+        if (itemAny.requiresMyBranchId && !myBranchId) {
+          return false;
+        }
+        return true;
+      });
+      return newLink;
+    }
+    return link;
+  });
+});
 
 const logoutHandler = async () => {
   logout().then((data) => {
@@ -160,20 +192,56 @@ const logoutHandler = async () => {
   });
 };
 
-
-
 // Initialize isOpen array with the same length as mainLinks and set all to false
-const isOpen = ref(new Array(mainLinks.length).fill(false));
+const isOpen = ref(new Array(allMainLinks.length).fill(false));
+const loading = ref(true);
+const { getAuthorities } = useAuth();
+import UiSkeleton from "~/components/ui/skeleton/Skeleton.vue";
+
+onMounted(async () => {
+  const merchantOperatorId = authStore.profile?.merchantOperatorId;
+  if (!merchantOperatorId) {
+    loading.value = false;
+    return;
+  }
+
+  // Check if permissions/roles are already loaded to avoid redundant fetch if moving between pages
+  if (authStore.permissions && authStore.permissions.length > 0) {
+    loading.value = false;
+    return;
+  }
+
+  try {
+    await getAuthorities(merchantOperatorId);
+  } finally {
+    loading.value = false;
+  }
+});
 
 const emits = defineEmits(["closeMenuNav"]); // Define custom event
 
 const closeMenuNav = () => {
   emits("closeMenuNav"); // Emit the toggleTheme event to the parent
 };
+
+const hasVisibleDropdownItems = (link: MenuItem) => {
+  return link.dropdown?.some((item) =>
+    useHasPermissions(item.permission ?? "")
+  );
+};
+
+function isRouteActive(path: string) {
+  if (path === "/") {
+    // For dashboard, only return true if we're exactly at the root
+    return route.path === "/";
+  }
+  // For other routes, keep the existing behavior
+  return route.path.startsWith(path);
+}
 </script>
 
 <style scoped>
 .router-link-active {
-  @apply font-bold text-white md:text-primary bg-primary md:bg-popover rounded-l-full  border-l-2;
+  @apply font-bold text-white md:text-primary bg-primary md:bg-popover rounded-l-full group-hover:rounded-l-lg border-l-2 p-3;
 }
 </style>

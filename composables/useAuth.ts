@@ -1,10 +1,9 @@
 import { Toast, ToastAction, useToast } from "~/components/ui/toast";
 import { useAuthUser } from "./useAuthUser";
-import type { AuthResponse, OtpDTO, TFAAccessTokenDTO, UserInput } from "~/types";
+import type { AuthResponse, OperatorRole, OtpDTO, TFAAccessTokenDTO, UserInput } from "~/types";
 import { handleApiError, type ApiResult } from "~/types/api";
 
 export const useAuth = () => {
-  const runtimeConfig = useRuntimeConfig();
   const authUser = useAuthUser();
   const userAdmin = useState<boolean>("userAdmin", () => false);
   const isLoading = ref<boolean>(false);
@@ -16,7 +15,7 @@ export const useAuth = () => {
   const login = async (user: UserInput) => {
     try {
       const { data, pending, error, status } = await fetch<AuthResponse>(
-        "/api/v1/operators/sign-in",
+        "/api/v1/merchants2/operators/sign-in",
         {
           method: "POST",
           body: user,
@@ -27,14 +26,43 @@ export const useAuth = () => {
       if (status.value === "error") {
         handleApiError(error);
       }
+      console.log("login response", data);
 
-      if (status.value === "success") {
+      if (data.value?.tokenDTO.accessToken) {
+        console.log("data", data.value);
+        const expiresIn = data.value?.tokenDTO?.accessTokenExpiresIn;
+        const absoluteExpiry =
+          typeof expiresIn === "number" && expiresIn > 0
+            ? expiresIn > 1e10
+              ? expiresIn
+              : Date.now() + expiresIn * 1000
+            : 0;
+        const refreshTokenExpiresIn = data.value?.tokenDTO?.refreshTokenExpiresIn;
+        const absoluteRefreshTokenExpiry =
+          typeof refreshTokenExpiresIn === "number" && refreshTokenExpiresIn > 0
+            ? refreshTokenExpiresIn > 1e10
+              ? refreshTokenExpiresIn
+              : Date.now() + refreshTokenExpiresIn * 1000
+            : 0;
         store.setAuth({
           ...user,
-          ...data?.value,
-          isAuthenticated: data?.value?.accessToken ? true : false,
+          ...data?.value?.tokenDTO,
+          isAuthenticated: data?.value?.tokenDTO?.accessToken ? true : false,
+          accessTokenExpiresIn: absoluteExpiry,
+          refreshTokenExpiresIn: absoluteRefreshTokenExpiry,
         });
-        await getProfile();
+        // const profileResponse =  await getProfile();   
+        // if(profileResponse){
+          store.setProfile(data.value?.operatorDTO)
+        // }    
+        // if(data.value?.operatorDTO?.merchantOperatorId){
+        //   const authoritiesResponse =  await getAuthorities(data.value?.operatorDTO?.merchantOperatorId); 
+        // } 
+    
+        // if(authoritiesResponse){
+        //   store.setProfile(profileResponse)
+        // }
+        // await getProfile();
         // navigateTo("/");
       }
 
@@ -54,7 +82,7 @@ export const useAuth = () => {
 
       try {
         const { data, pending, error, status } = await fetch<any>(
-          "/api/v1/auth/status",
+          "/api/v1/internal/auth/status",
           {
             method: "POST",
             header: useRequestHeaders(["cookie"]),
@@ -95,7 +123,7 @@ export const useAuth = () => {
   ) => ApiResult<OtpDTO> = async (deliveryMethod) => {
     try {
       const { data, pending, error, status } = await fetch<OtpDTO>(
-        `/api/v1/auth/two-factor/request-token?deliveryMethod=${deliveryMethod}`,
+        `/api/v1/internal/auth/two-factor/request-token?deliveryMethod=${deliveryMethod}`,
         {
           method: "POST",
         }
@@ -125,7 +153,7 @@ export const useAuth = () => {
   ) => ApiResult<TFAAccessTokenDTO> = async (otp) => {
     try {
       const { data, pending, error, status } = await fetch<TFAAccessTokenDTO>(
-        `/api/v1/auth/two-factor/validate`,
+        `/api/v1/internal/auth/two-factor/validate`,
         {
           method: "POST",
           body: {
@@ -154,38 +182,105 @@ export const useAuth = () => {
     }
   };
 
-  const getAuthorities = async () => {
+  // const getAuthorities = async () => {
+  //   try {
+  //     const { data, pending, error, status } = await fetch<OperatorRole[]>(
+  //       `/api/v1/internal/auth/roles`,
+  //       {
+  //         method: "GET",
+  //       }
+  //     );
+
+  //     isLoading.value = pending.value;
+
+  //     if (status.value === "error") {
+  //       handleApiError(error);
+  //     }
+
+  //     if (status.value === "success") {
+  //       console.log("permissions: ", data.value.permissions)
+  //       store.$patch({
+  //         permissions: data?.value && data?.value?.permissions,
+  //       });
+  //       // store.setPermissions({
+  //       //   permissions: data?.value && data?.value?.permissions,
+  //       // });
+
+  //       navigateTo("/");
+  //     }
+
+  //     return data.value ? (data.value as unknown as any) : null;
+  //   } catch (err) {
+  //     // handleApiError(err);
+  //     return null;
+  //   } finally {
+  //     isLoading.value = false;
+  //   }
+  // };
+
+
+  const getAuthorities: (currentOperatorId:string) => ApiResult<string[]> = async (currentOperatorId) => {
     try {
-      const { data, pending, error, status } = await fetch<any[]>(
-        `/api/v1/auth/roles`,
-        {
-          method: "GET",
-        }
+      const { data, pending, error, status } = await fetch<AuthResponse>(
+        `/api/v1/merchants2/operators/permissions/mine`
       );
 
       isLoading.value = pending.value;
 
       if (status.value === "error") {
-        handleApiError(error);
+        navigateTo("/login");
+        await handleApiError(error);
       }
 
-      if (status.value === "success") {
-        store.setPermissions({
-          permissions: data?.value && data?.value?.permissions,
+      const response = data.value as string[];
+
+
+
+      if (status.value == "success" && response) {
+        console.log("response: ", response)
+        store.$patch({
+          permissions: response,
         });
-
-        navigateTo("/");
+      await getAuthoritiesRole(currentOperatorId)
       }
 
-      return data.value ? (data.value as unknown as any) : null;
+      return response;
     } catch (err) {
-      // handleApiError(err);
+      handleApiError(err);
+      navigateTo("/login");
       return null;
-    } finally {
-      isLoading.value = false;
     }
   };
 
+  const getAuthoritiesRole: (currentOperatorId:string) => ApiResult<string[]> = async (currentOperatorId) => {
+    try {
+      const { data, pending, error, status } = await fetch<AuthResponse>(
+        `/api/v1/merchants2/operators/role/mine`
+      );
+
+      isLoading.value = pending.value;
+
+      if (status.value === "error") {
+        navigateTo("/login");
+        await handleApiError(error);
+      }
+
+      const response = data.value as string[];
+
+      if (status.value == "success" && response) {
+        console.log("response: ", response)
+        store.$patch({
+          role: response,
+        });
+      }
+
+      return response;
+    } catch (err) {
+      handleApiError(err);
+      navigateTo("/login");
+      return null;
+    }
+  };
 
 
   return {

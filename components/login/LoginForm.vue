@@ -89,7 +89,7 @@ navigateTo("/", { replace: true });
 
         <FormField v-slot="{ componentField }" name="password">
           <FormItem>
-            <FormLabel>Password</FormLabel>
+            <FormLabel>PIN</FormLabel>
             <FormControl>
               <div
                 className="relative flex items-center bg-input rounded-lg pl- focus-within:ring-1 focus-within:ring-primary"
@@ -101,32 +101,32 @@ navigateTo("/", { replace: true });
                   :disabled="isLoading"
                   aria-autocomplete="password"
                 />
-
                 <Icon
-                  v-if="showPassword"
-                  name="material-symbols:visibility-off-rounded"
-                  class="absolute flex right-0 pr-3 items-center w-8 h-8"
-                  @Click="togglePasswordVisibility"
-                ></Icon>
-                <Icon
-                  v-else
+                v-if="showPassword"
                   name="material-symbols:visibility-rounded"
                   class="absolute flex right-0 pr-3 items-center w-8 h-8"
                   @Click="togglePasswordVisibility"
                 ></Icon>
+                <Icon
+                v-else
+                  name="material-symbols:visibility-off-rounded"
+                  class="absolute flex right-0 pr-3 items-center w-8 h-8"
+                  @Click="togglePasswordVisibility"
+                ></Icon>
+         
               </div>
             </FormControl>
             <FormMessage />
           </FormItem>
         </FormField>
 
-        <NuxtLink
+        <!-- <NuxtLink
           to="/forgotPassword"
           class="text-primary text-right text-sm pb-3"
         >
           Forgot Password?
-        </NuxtLink>
-        <UiButton :disabled="isLoading">
+        </NuxtLink> -->
+        <UiButton :disabled="isLoading" class="mt-3">
           <Icon
             v-if="isLoading"
             name="svg-spinners:8-dots-rotate"

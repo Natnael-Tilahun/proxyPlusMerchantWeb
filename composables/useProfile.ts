@@ -12,7 +12,7 @@ export const useProfile = () => {
     const getProfile: () => ApiResult<Profile> = async () => {
         try {
             const { data, pending, error, status } = await fetch<Profile>(
-              `/api/v1/operators/me`,
+              `/api/v1/merchants2/operators/me`,
               {
                 method: "GET",
               }

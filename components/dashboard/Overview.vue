@@ -85,6 +85,7 @@ const maxValue = computed(() =>
 
 <template>
   <BarChart
+    class="max-h-[350px]"
     index="name"
     :data="data"
     :categories="['completed', 'Pending', 'Failed']"

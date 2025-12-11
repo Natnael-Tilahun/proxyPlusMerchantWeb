@@ -12,15 +12,20 @@ import { defineProps } from "vue";
 import { Toast, ToastAction, useToast } from "~/components/ui/toast";
 
 const isLoading = ref(false);
-const { sendPushUssd } = usePayment();
+const { sendPushUssd, initiatePaymentOtp } = usePayment();
 const { toast } = useToast();
+const router = useRouter()
+const route = useRoute()
+const paymentResponse = ref<any>(route.query);
+const isOtpSent = computed(() => route.query.sendOtp === 'true')
+
 
 const form = useForm({
   validationSchema: initiatePaymentPushUssdFormSchema,
 });
 
 // Define props
-const props = defineProps(["merchantTransactionId"]);
+const props = defineProps(["merchantTransactionId", "customerPhone"]);
 
 const onSubmit = form.handleSubmit(async (values: any) => {
   isLoading.value = true;
@@ -31,13 +36,13 @@ const onSubmit = form.handleSubmit(async (values: any) => {
 
   try {
     const data = await sendPushUssd(transactionData);
-    if(data){
+    if (data) {
       toast({
         title: "Push USSD sent successfully.",
         description: data,
         variant: "default",
       });
-      navigateTo("/", { replace: true });
+      navigateTo(`/transactions/mine/${props.merchantTransactionId}`, { replace: true });
     }
   } catch (error) {
     console.error("Login error: ", error);
@@ -45,6 +50,48 @@ const onSubmit = form.handleSubmit(async (values: any) => {
     isLoading.value = false;
   }
 });
+
+const sendOtpHandler = async () => {
+  // isLoading.value = true;
+  const transactionData = {
+    merchantTransactionId: props.merchantTransactionId,
+    customerPhone: props.customerPhone || form.values.customerPhone,
+  };
+
+  if(!transactionData.customerPhone){
+    toast({
+      title: "Please insert phone number first",
+      description: "You need to insert a phone number to send an OTP.",
+      variant: "destructive"
+    })
+    form.setErrors({customerPhone: "Phone number is required."})
+    return
+  }
+
+  try {
+    const data = await initiatePaymentOtp(transactionData);
+    if (data) {
+      toast({
+        title: "OTP sent successfully.",
+        description: data?.message,
+        variant: "default",
+      });
+      router.push({
+        name: route.name, // Use the current route's name
+        query: {
+          ...paymentResponse.value,
+          customerPhone: transactionData.customerPhone,
+          sendOtp: true
+        },
+        replace: true
+      });
+      // navigateTo(`/transactions/mine/${merchantTransactionId}`, { replace: true });
+    }
+  } catch (error) {
+    console.error("OTP error: ", error);
+  }
+};
+
 </script>
 
 <template>
@@ -57,30 +104,21 @@ const onSubmit = form.handleSubmit(async (values: any) => {
             <FormItem>
               <FormLabel> Phone No.</FormLabel>
               <FormControl>
-                <UiInput
-                  type="text"
-                  class="h-10"
-                  placeholder="100012345678"
-                  v-bind="componentField"
-                  :disabled="isLoading"
-                />
+                <UiInput type="text" class="h-10" placeholder="Enter phone number" v-bind="componentField"
+                  :disabled="isLoading" />
               </FormControl>
               <FormMessage />
             </FormItem>
           </FormField>
         </div>
-        <UiButton
-          class="hover:bg-fuchsia-800 text-base font-medium w-full"
-          :disabled="isLoading"
-        >
-          <Icon
-            name="svg-spinners:8-dots-rotate"
-            v-if="isLoading"
-            class="mr-2 h-4 w-4 animate-spin"
-          ></Icon>
+        <UiButton class="hover:bg-fuchsia-800 text-base font-medium w-full" :disabled="isLoading">
+          <Icon name="svg-spinners:8-dots-rotate" v-if="isLoading" class="mr-2 h-4 w-4 animate-spin"></Icon>
 
           Send Push USSD
         </UiButton>
+      </div>
+      <div class="flex justify-end" v-if="!isOtpSent" >
+        <UiButton type="button" @click="sendOtpHandler" variant="link">Send OTP</UiButton>
       </div>
     </form>
   </UiCard>

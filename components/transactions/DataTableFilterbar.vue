@@ -12,6 +12,12 @@ const props = defineProps<
 >();
 const showOtherFilteration = ref(false);
 const transactionFilterStore = useTransactionFilterStore();
+const { getBranches } = useBranches();
+const { getMerchantOperators } = useOperators();
+const branchesData = useState<any[]>("branches", () => []);
+const isError = ref(false);
+const loading = ref(false);
+const operatorsData = useState<any[]>("operators", () => []);
 // const branchesStore = useBranchesStore();
 // const operatorsStore = useOperatorsStore();
 const paymentStatusOptions = computed(() => [
@@ -37,6 +43,42 @@ const clearFilter = () => {
 // const isFiltered = computed(
 //   () => props.table.getState().columnFilters.length > 0
 // );
+
+const fetchBranchesData = async () => {
+  if (branchesData.value.length > 0) return;
+  try {
+    isError.value = false;
+    loading.value = true;
+    const response = await getBranches(0, 1000000);
+    branchesData.value = response || [];
+  } catch (err) {
+    console.error("Error fetching branches", err);
+    isError.value = true;
+  } finally {
+    loading.value = false;
+  }
+};
+
+const fetchOperatorsData = async () => {
+  if (operatorsData.value.length > 0) return;
+  try {
+    isError.value = false;
+    loading.value = true;
+    const response = await getMerchantOperators(0, 1000000);
+    operatorsData.value = response || [];
+  } catch (err) {
+    console.error("Error fetching operators", err);
+    isError.value = true;
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(async () => {
+  transactionFilterStore.$reset();
+  await fetchBranchesData();
+  await fetchOperatorsData();
+});
 </script>
 
 <template>
@@ -82,7 +124,7 @@ const clearFilter = () => {
             placeholder="Filter by payer account number"
             v-model="transactionFilterStore.payerAccountNumber"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -92,7 +134,7 @@ const clearFilter = () => {
             placeholder="Filter by payer phone number"
             v-model="transactionFilterStore.payerPhone"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -102,7 +144,7 @@ const clearFilter = () => {
             placeholder="Filter by payer id"
             v-model="transactionFilterStore.payerId"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -114,7 +156,7 @@ const clearFilter = () => {
             placeholder="Filter by amount greater than or equal"
             v-model="transactionFilterStore.amountGreaterThanOrEqual"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -126,7 +168,7 @@ const clearFilter = () => {
             placeholder="Filter by amount less than or equal"
             v-model="transactionFilterStore.amountLessThanOrEqual"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -138,7 +180,7 @@ const clearFilter = () => {
             placeholder="Filter by payment reference"
             v-model="transactionFilterStore.paymentReference"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -148,7 +190,7 @@ const clearFilter = () => {
             placeholder="Filter by dynamic id"
             v-model="transactionFilterStore.dynamicId"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -160,7 +202,7 @@ const clearFilter = () => {
             placeholder="Filter by mobile banking transaction id"
             v-model="transactionFilterStore.mbTransactionId"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -172,7 +214,7 @@ const clearFilter = () => {
             placeholder="Filter by core transaction id"
             v-model="transactionFilterStore.coreTransactionId"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -184,7 +226,7 @@ const clearFilter = () => {
             placeholder="Filter by merchant account number"
             v-model="transactionFilterStore.merchantAccountNumber"
             class="h-10 min-w-[250px] w-full"
-            @keydown.enter="refetch"
+            @keydown.enter="refetch()"
           />
         </div>
 
@@ -233,20 +275,20 @@ const clearFilter = () => {
             </UiSelectContent>
           </UiSelect>
         </div>
-        <!-- 
+
         <div class="space-y-1">
-          <label for="branch" class="text-sm">{{ $t("branch") }}</label>
+          <label for="branch" class="text-sm">Branch</label>
           <UiSelect
             name="branch"
             v-model="transactionFilterStore.merchantBranchId"
             @update:model-value="() => refetch()"
           >
             <UiSelectTrigger class="h-10 min-w-[150px] w-full">
-              <UiSelectValue :placeholder="$t('filter_by_branch')" />
+              <UiSelectValue placeholder="Filter by branch" />
             </UiSelectTrigger>
             <UiSelectContent side="bottom">
               <UiSelectItem
-                v-for="branch in branchesStore.branches"
+                v-for="branch in branchesData"
                 :key="branch.merchantBranchId"
                 :value="branch.merchantBranchId"
               >
@@ -254,21 +296,21 @@ const clearFilter = () => {
               </UiSelectItem>
             </UiSelectContent>
           </UiSelect>
-        </div> -->
+        </div>
 
-        <!-- <div class="space-y-1">
-          <label for="operator" class="text-sm">{{ $t("operator") }}</label>
+        <div class="space-y-1">
+          <label for="operator" class="text-sm">Operator</label>
           <UiSelect
             name="operator"
             v-model="transactionFilterStore.merchantOperatorId"
             @update:model-value="() => refetch()"
           >
             <UiSelectTrigger class="h-10 min-w-[150px] w-full">
-              <UiSelectValue :placeholder="$t('filter_by_operator')" />
+              <UiSelectValue placeholder="Filter by operator" />
             </UiSelectTrigger>
             <UiSelectContent side="bottom">
               <UiSelectItem
-                v-for="operator in operatorsStore.operators"
+                v-for="operator in operatorsData"
                 :key="operator.merchantOperatorId"
                 :value="operator.merchantOperatorId"
               >
@@ -276,9 +318,9 @@ const clearFilter = () => {
               </UiSelectItem>
             </UiSelectContent>
           </UiSelect>
-        </div> -->
+        </div>
 
-        <div class="space-y-1">
+        <!-- <div class="space-y-1">
           <label for="initiatedDate" class="text-sm">Initiated Date</label>
           <UiPopover>
             <UiPopoverTrigger asChild>
@@ -309,7 +351,7 @@ const clearFilter = () => {
               />
             </UiPopoverContent>
           </UiPopover>
-        </div>
+        </div> -->
 
         <div class="space-y-1">
           <label for="completedDate" class="text-sm">Completed Date</label>

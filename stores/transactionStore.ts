@@ -13,8 +13,8 @@ interface TransactionFilterState {
     merchantTransactionId: string;
     dynamicId: string;
     transactionRefId: string;
-    amountGreaterThanOrEqual: number,
-    amountLessThanOrEqual: number,
+    amountGreaterThanOrEqual: number | string,
+    amountLessThanOrEqual: number | string,
     paymentReference: string;
     mbTransactionId: string;
     coreTransactionId: string;
@@ -33,7 +33,7 @@ export const useTransactionFilterStore = defineStore("transactionStore", {
         paymentStatus: "COMPLETED",
         pageNumber: 0,
         pageSize: 20,
-        sortBy: "desc",
+        sortBy: "DESC",
         transactionInitiator: "",
         amountGreaterThanOrEqual: 0,
         amountLessThanOrEqual: 0,
@@ -61,7 +61,7 @@ export const useTransactionFilterStore = defineStore("transactionStore", {
             this.paymentStatus = filter?.paymentStatus ?? "";
             this.pageNumber = filter?.pageNumber ?? 0;
             this.pageSize = filter?.pageSize ?? 20;
-            this.sortBy = filter?.sortBy ?? "desc";
+            this.sortBy = filter?.sortBy ?? "DESC";
             this.expirationDate = filter?.expirationDate ? new Date(filter.expirationDate).toISOString() : "";
             this.completedDate = filter?.completedDate ? new Date(filter.completedDate).toISOString() : "";
             this.initiatedDate = filter?.initiatedDate ? new Date(filter.initiatedDate).toISOString() : "";
