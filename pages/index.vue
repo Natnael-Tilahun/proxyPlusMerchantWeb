@@ -10,12 +10,12 @@ const {
   transactions: recentTransactionsRaw,
   loading: recentLoading,
   size: recentSize,
-  sort: recentSort,
   fetchTransactions: fetchRecent,
 } = useTransactions({
   mode: "mine",
   ignoreStore: true,
   autoFetch: false, // Prevent double fetch
+  sortValue: "initiatedDate,desc"
 });
 
 const recentTransactions = computed(() => recentTransactionsRaw.value || []);
@@ -29,11 +29,11 @@ const {
   fetchTransactions: fetchStats,
   filters: statsFilters,
   size: statsSize,
-  sort: statsSort, // Ensure we can sort if needed, though default is fine
 } = useTransactions({
   mode: "mine",
   ignoreStore: true,
   autoFetch: false,
+  sortValue: "initiatedDate,desc"
 });
 
 const statsTransactions = computed(() => statsTransactionsRaw.value || []);
@@ -52,7 +52,8 @@ const paymentSummaryOptions = computed(() => [
 onMounted(() => {
   // 1. Fetch Recent Sales
   recentSize.value = 20;
-  recentSort.value = "expirationDate,DESC";
+  // sortValue: "initiatedDate,desc" 
+  // recentSort.value = "expirationDate,DESC";
   fetchRecent();
 
   // 2. Fetch Stats Data (One big fetch for the Year)

@@ -35,7 +35,7 @@ const {
   fetchTransactions: refetch,
   onPageChange,
   onSizeChange,
-} = useTransactions({ mode: "mine" });
+} = useTransactions({ mode: "mine", sortValue: "initiatedDate,desc" });
 
 const navigateToPrintTransactions = () => {
   router.push({

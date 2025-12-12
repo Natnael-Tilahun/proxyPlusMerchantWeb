@@ -25,6 +25,7 @@ const {
   operatorId: operatorId,
   autoFetch: true, // Auto fetch on mount
   ignoreStore: false, // Keep using global filters as per previous behavior
+  sortValue: "initiatedDate,desc",
 });
 
 const router = useRouter();
