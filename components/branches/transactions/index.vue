@@ -25,6 +25,7 @@ const {
   branchId: branchId,
   autoFetch: true,
   ignoreStore: false,
+  sortValue: "initiatedDate,desc",
 });
 
 const router = useRouter();

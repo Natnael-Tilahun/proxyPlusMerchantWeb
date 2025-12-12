@@ -13,8 +13,9 @@ export const useTransactions = (options: {
   operatorId?: string;
   branchId?: string;
   ignoreStore?: boolean;
+  sortValue?: string;
 } = {}) => {
-  const { autoFetch = true, mode = "all", ignoreStore = false } = options;
+  const { autoFetch = true, mode = "all", ignoreStore = false, sortValue } = options;
   const runtimeConfig = useRuntimeConfig();
   const store = useAuthStore();
   const transactionFilterStore = useTransactionFilterStore();
@@ -48,6 +49,7 @@ export const useTransactions = (options: {
     onFiltersChange,
   } = usePagination<Transaction>({
     endpoint: endpoint,
+    sortValue,
     options: {
       autoFetch: false,
     },
@@ -572,7 +574,7 @@ export const useTransactions = (options: {
     paymentStatus = undefined,
     pageNumber = undefined,
     pageSize = undefined,
-    sortBy = undefined,
+    sortBy = "initiatedDate,desc",
     expirationDate = undefined,
     transactionInitiator = undefined,
     amountGreaterThanOrEqual = undefined,
@@ -788,7 +790,7 @@ export const useTransactions = (options: {
     paymentStatus = undefined,
     pageNumber = undefined,
     pageSize = undefined,
-    sortBy = undefined,
+    sortBy = "initiatedDate,desc",
     expirationDate = undefined,
     transactionInitiator = undefined,
     amountGreaterThanOrEqual = undefined,

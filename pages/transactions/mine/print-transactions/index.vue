@@ -6,43 +6,47 @@ import { format } from "date-fns";
 import { cn } from "~/lib/utils";
 import { Calendar as CalendarIcon } from "lucide-vue-next";
 import { Icons } from "~/components/icons";
-import type { Transaction } from "~/types";
 
-const transactionData = ref<Transaction[]>([]);
-const isLoading = ref(true);
-const isError = ref(false);
-const { getMyTransactions } = useTransactions();
+const {
+  transactions: transactionData,
+  loading: isLoading,
+  error: isError,
+  fetchTransactions,
+  filters,
+  size,
+  page,
+} = useTransactions({
+  mode: "mine",
+  ignoreStore: true,
+  autoFetch: true,
+  sortValue: "initiatedDate,desc",
+});
+
 const startDate = ref<Date>();
 const endDate = ref<Date>();
 const selectedAccount = ref<string>();
 
-// Fetch transaction data based on the account ID or other parameters
+// Fetch transaction data based on filters
 async function fetchTransactionData() {
-  try {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    yesterday.setHours(0, 0, 0, 0);
-    isLoading.value = true;
-    const response = await getMyTransactions(" ", "0", "1000000000", "DESC");
-    transactionData.value = response
-      ?.slice()
-      ?.sort(
-        (a, b) =>
-          new Date(b.expirationDate).getTime() -
-          new Date(a.expirationDate).getTime()
-      );
-    selectedAccount.value = transactionData.value[0]?.merchantAccountNumber;
-  } catch (error) {
-    console.error("Error fetching transactions:", error);
-    isError.value = true;
-  } finally {
-    isLoading.value = false;
+  const f: Record<string, any> = {};
+  if (startDate.value) {
+    f["initiatedDate.greaterThanOrEqual"] = startDate.value.toISOString();
+  }
+  if (endDate.value) {
+    // Assuming API supports inclusive end date or we adjust
+    f["initiatedDate.lessThanOrEqual"] = endDate.value.toISOString();
+  }
+
+  // Update filters and fetch
+  filters.value = f;
+  await fetchTransactions();
+
+  if (transactionData.value && transactionData.value.length > 0) {
+    selectedAccount.value = transactionData.value[0].merchantAccountNumber;
   }
 }
 
-fetchTransactionData();
-
-onMounted(() => {
+watch([startDate, endDate], () => {
   fetchTransactionData();
 });
 
@@ -85,60 +89,80 @@ function downloadStatement() {
 </script>
 
 <template>
-  <div class="space-y-12 py-6">
+  <UiCard class="space-y-6 bg-background p-6">
     <div
-      class="flex flex-col md:flex-row md:items-center md:justify-between w-full gap-4"
+      class="flex flex-col lg:flex-row border p-4 rounded-lg bg-muted lg:items-center lg:justify-between w-full gap-4 text-sm"
     >
-      <div class="flex flex-col md:items-start gap-2">
-        <h1 class="text-foreground text-base">Select Statement Duration:</h1>
-        <div class="flex flex-col md:flex-row gap-8">
-          <UiPopover>
-            <UiPopoverTrigger as-child>
-              <UiButton
-                :variant="'outline'"
-                :class="
-                  cn(
-                    'md:w-fit w-full rounded-lg justify-start text-left font-medium text-base',
-                    !startDate && 'text-secondary-foreground'
-                  )
-                "
-              >
-                <CalendarIcon class="mr-2 h-4 w-4" />
-                <span>{{
-                  startDate ? format(startDate, "PPP") : "DD/MM/YYYY"
-                }}</span>
-                <Icons.arrowDown class="ml-4 h-4 w-4" />
-              </UiButton>
-            </UiPopoverTrigger>
-            <UiPopoverContent class="w-auto p-0">
-              <UiCalendar v-model="startDate" />
-            </UiPopoverContent>
-          </UiPopover>
-          <UiPopover>
-            <UiPopoverTrigger as-child>
-              <UiButton
-                :variant="'outline'"
-                :class="
-                  cn(
-                    'md:w-fit w-full rounded-lg justify-start text-left font-medium text-base mr-auto',
-                    !endDate && 'text-secondary-foreground'
-                  )
-                "
-              >
-                <CalendarIcon class="mr-2 h-4 w-4" />
-                <span>{{
-                  endDate ? format(endDate, "PPP") : "DD/MM/YYYY"
-                }}</span>
-                <Icons.arrowDown class="ml-4 h-4 w-4" />
-              </UiButton>
-            </UiPopoverTrigger>
-            <UiPopoverContent class="w-auto p-0">
-              <UiCalendar v-model="endDate" />
-            </UiPopoverContent>
-          </UiPopover>
+      <div class="flex flex-col md:flex-row lg:items-center w-full gap-4">
+        <div class="flex flex-col md:items-start gap-2">
+          <h1 class="text-foreground">Select Statement Duration:</h1>
+          <div class="flex flex-col md:flex-row gap-8">
+            <UiPopover>
+              <UiPopoverTrigger as-child>
+                <UiButton
+                  :variant="'outline'"
+                  :class="
+                    cn(
+                      'md:w-fit w-full rounded-lg justify-start text-left font-medium',
+                      !startDate && 'text-secondary-foreground'
+                    )
+                  "
+                >
+                  <CalendarIcon class="mr-2 h-4 w-4" />
+                  <span>{{
+                    startDate ? format(startDate, "PPP") : "DD/MM/YYYY"
+                  }}</span>
+                  <Icons.arrowDown class="ml-4 h-4 w-4" />
+                </UiButton>
+              </UiPopoverTrigger>
+              <UiPopoverContent class="w-auto p-0">
+                <UiCalendar v-model="startDate" />
+              </UiPopoverContent>
+            </UiPopover>
+            <UiPopover>
+              <UiPopoverTrigger as-child>
+                <UiButton
+                  :variant="'outline'"
+                  :class="
+                    cn(
+                      'md:w-fit w-full rounded-lg justify-start text-left font-medium mr-auto',
+                      !endDate && 'text-secondary-foreground'
+                    )
+                  "
+                >
+                  <CalendarIcon class="mr-2 h-4 w-4" />
+                  <span>{{
+                    endDate ? format(endDate, "PPP") : "DD/MM/YYYY"
+                  }}</span>
+                  <Icons.arrowDown class="ml-4 h-4 w-4" />
+                </UiButton>
+              </UiPopoverTrigger>
+              <UiPopoverContent class="w-auto p-0">
+                <UiCalendar v-model="endDate" />
+              </UiPopoverContent>
+            </UiPopover>
+          </div>
+        </div>
+        <div class="flex flex-col md:items-start gap-2">
+          <p class="text-sm font-medium">Rows per page</p>
+          <UiSelect
+            :model-value="`${size}`"
+            @update:model-value="(v) => (size = Number(v))"
+          >
+            <UiSelectTrigger class="h-10 w-[100px]">
+              <UiSelectValue placeholder="Size" />
+            </UiSelectTrigger>
+            <UiSelectContent>
+              <UiSelectItem value="20">20</UiSelectItem>
+              <UiSelectItem value="50">50</UiSelectItem>
+              <UiSelectItem value="100">100</UiSelectItem>
+              <UiSelectItem value="1000">1000</UiSelectItem>
+              <UiSelectItem value="10000">10000</UiSelectItem>
+            </UiSelectContent>
+          </UiSelect>
         </div>
       </div>
-      <UiButton class="px-8" @click="downloadStatement"
+      <UiButton class="px-8 w-fit whitespace-nowrap" @click="downloadStatement"
         >Download Pdf
         <Icons.download class="ml-4 h-4 w-4" />
       </UiButton>
@@ -249,5 +273,5 @@ function downloadStatement() {
         </UiTableBody>
       </UiTable>
     </div>
-  </div>
+  </UiCard>
 </template>
