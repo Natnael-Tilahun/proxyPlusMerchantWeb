@@ -59,7 +59,7 @@ const {
   fetchTransactions: refetch,
   onPageChange,
   onSizeChange,
-} = useTransactions({ mode: "branch", branchId: myBranchId.value });
+} = useTransactions({ mode: "branch", branchId: myBranchId.value, sortValue: "initiatedDate,desc" });
 
 const navigateToPrintTransactions = () => {
   router.push({
