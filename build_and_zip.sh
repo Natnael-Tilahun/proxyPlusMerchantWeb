@@ -11,13 +11,13 @@ ENVIRONMENT="$1"
 # Set path based on environment
 case "$ENVIRONMENT" in
     dev)
-        BUILD_FILE_PATH="/home/natnael-tilahun/Documents/Projectx files/merchant/dev"
+        BUILD_FILE_PATH="/home/natnael/Documents/Projectx files/merchant/dev"
         ;;
     uat)
-        BUILD_FILE_PATH="/home/natnael-tilahun/Documents/Projectx files/merchant/uat"
+        BUILD_FILE_PATH="/home/natnael/Documents/Projectx files/merchant/uat"
         ;;
     prod)
-        BUILD_FILE_PATH="/home/natnael-tilahun/Documents/Projectx files/merchant/prod"
+        BUILD_FILE_PATH="/home/natnael/Documents/Projectx files/merchant/prod"
         ;;
     *)
         echo "Invalid environment: $ENVIRONMENT"
